@@ -1,0 +1,9 @@
+Model:
+- Lower layer representation extracted by ConvNet is highly representative of visual features
+- Usage HHM for depth information
+- Usage of combined error for more representative results
+- Use the reading group paper about sparse (Rationalizing Neural Predictions)
+
+
+Assessment:
+-
