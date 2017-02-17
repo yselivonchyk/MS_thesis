@@ -3,10 +3,17 @@
 \chapter{Technical details}
 \label{cha:tede}
 
-\section{Neural Networks}
+This chapter provides technical details relevant to the method proposed in chapter \ref{cha:mode}.
+In subsection \ref{cha:nn} we provide overview of artificaial neural networks and related optimization techniques.
+Subsection \ref{cha:ae} describes several unsupervised learning techniques for artificial neural networks also known as Autoencoders.
 
-\subsection{Artificial Neural Network}
+\section{Neural Networks}
+\label{cha:nn}
+
+% \subsection{Artificial Neural Network}
 \subsection{Convolutional Neural Networks}
+\label{cha:cnn}
+
 \subsection{Optimization techniques}
 \subsection{Regularization}
 
@@ -15,9 +22,56 @@
 
 
 
-\section{Autoencoders}
-Has good technical description of CNN and AE: \cite{Masci2011}
+\section{Autoencoders}\label{cha:ae}
+An autoencoder or autoassociator neural network is an unsupervised learning algorithm that sets target output values equal to input values $y_i=x_i$ \cite{Ng2011,RanzatoMarcAurelio2007}.
+Autoencoders are usually trained according to \textit{encoder-decoder} paradigm.
+Which first allows to project or encode input $x_i$ into some usefull feature representaiton $h_i$.
+Then reconstruct or decode original input $\hat{y_i}$ from representation $h_i$.
+This process is schematically on image 1.
 
-\subsection{Denoising Autoencoders}
-\subsection{Sparce Autoencoders}
-\subsection{Variational Autoencoders}
+We are going to refer to encoder as a deterministic differentiable function $f(x, \theta_f)$ that for a given set of parameters $\theta_f$ maps input $x\in \Bbb{R}^d$ into representation $h \in \Bbb{R}^{d'}$.
+Likewise, decoder is deterministic differentiable function $g(h, \theta_g)$ depending on parameters $\theta_g$ maps $h\in\Bbb{R}^{d'}$ into $y\in \Bbb{R}^d$. We will further avoid specifing parameters $\theta_f$ and $\theta_g$ for simplicity.
+Given a loss function $L$, for a datset $X=\{x_0, ..., x_i\}$ we can define learning objective as follows \cite{Good2016}:
+
+\begin{equation}\label{eq:primal}
+\min_{\theta_f, \theta_g}\sum\limits_{x_i \in X}{L(x_i, g(f(x))}
+\end{equation}
+
+Learning identity mapping itself is not particulaly usefull.
+Instead we are often interested in reusing only parts of the autoencoder.
+Encoder parameters $\theta_f$ can be used as initialization of a dicriminative model \cite{Masci2011, Vincent2010, Zhao2015}.
+Such initialization results in minor yet coherent improvement of generalization properties of the model.
+Variational Autoencoders, on the other hand, reuse decoder as a generator of new training examples \cite{Kingma2013}.
+Extracted features $h$ can represent interpretable properties of the input and can be used to adjust this
+properties during generation process \cite{Kulkarni2015, Whitney2016}.
+
+Learning useful feature represenation is not a trivial task.
+One of the common issues of training autoencoders is posibility to learn identity mapping of input data.
+Learning identity mapping would result in less informative feature representation of the inputs.
+For example, we can represent both encoder and decoder as a linear function and set the size of the feature space so that it exceeds the size of input space $d' > d$.
+Then components of autoencoder can both learn simple identity mapping from input space into feature space and wise-versa.
+Therefore, it is common to either limit capacity of the feature space to be less than input space or impose additional regularization on extracted features.
+
+Additionally, both encoder and decoder can be represented as arbtitrary neural network.
+If capacity of any of two networks is hight enough, it would again lead to learning of identity mapping.
+On the other hand, if capacity is chosen too low it can hurt the learning process.
+For example, low capacity of generator network in Variatoinal Autoecoders can result in mode collapse.
+
+One of the ways to address the problem of overly high capacity of components can be using stacked autoencoders.
+In this approach, instead of directly mapping $h=f(x)$ and $y=g(h)$ into desired lower-dimensional space multiple intermidiate mappings can be used $h_i=f_i(h_{i-1})$ and $y_i=g_i(y_{i-1})$.
+Stacked autoencoder can be trained in layerwise manner.
+In this case first mappings $y=g_0(h_0)$ and $h_0=f_0(x)$ are trained.
+Then follows training of mappings $y_1=g_1(h_1)$ and $h_1=f_0(h_0)$ and so forth.
+Architecture of stacked autoencoder is presented on figure
+% \ref{fig}
+
+
+
+\subsection{Denoising Autoencoders}\label{cha:dae}
+
+
+
+\subsection{Sparce Autoencoders}\label{cha:sae}
+\subsection{Variational Autoencoders}\label{cha:vae}
+\subsection{Generative adcersarial nets}\label{cha:gan}
+\section{Autoencoders and feature interpretability}
