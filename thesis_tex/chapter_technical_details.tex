@@ -1,18 +1,18 @@
 % !TEX root = ./thesis.tex
 
 \chapter{Technical details}
-\label{cha:tede}
+\label{ch:tede}
 
-This chapter provides technical details relevant to the method proposed in chapter \ref{cha:mode}.
-In subsection \ref{cha:nn} we provide overview of artificaial neural networks and related optimization techniques.
-Subsection \ref{cha:ae} describes several unsupervised learning techniques for artificial neural networks also known as Autoencoders.
+This chapter provides technical details relevant to the method proposed in chapter \ref{ch:mode}.
+In subsection \ref{ch:nn} we provide overview of artificaial neural networks and related optimization techniques.
+Subsection \ref{ch:ae} describes several unsupervised learning techniques for artificial neural networks also known as Autoencoders.
 
 \section{Neural Networks}
-\label{cha:nn}
+\label{ch:nn}
 
 % \subsection{Artificial Neural Network}
 \subsection{Convolutional Neural Networks}
-\label{cha:cnn}
+\label{ch:cnn}
 
 \subsection{Optimization techniques}
 \subsection{Regularization}
@@ -22,7 +22,7 @@ Subsection \ref{cha:ae} describes several unsupervised learning techniques for a
 
 
 
-\section{Autoencoders}\label{cha:ae}
+\section{Autoencoders}\label{ch:ae}
 An autoencoder or autoassociator neural network is an unsupervised learning algorithm that sets target output values equal to input values $y_i=x_i$ \cite{Ng2011,RanzatoMarcAurelio2007}.
 Autoencoders are usually trained according to \textit{encoder-decoder} paradigm.
 Which first allows to project or encode input $x_i$ into some usefull feature representaiton $h_i$.
@@ -42,7 +42,7 @@ We are going to refer to encoder as a deterministic differentiable function $f(x
 Likewise, decoder is deterministic differentiable function $g(h, \theta_g)$ depending on parameters $\theta_g$ maps $h\in\Bbb{R}^{d'}$ into $y\in \Bbb{R}^d$. We will further avoid specifing parameters $\theta_f$ and $\theta_g$ for simplicity.
 Given a loss function $L$, for a datset $X=\{x_0, ..., x_i\}$ we can define learning objective as follows \cite{Good2016}:
 
-\begin{equation}\label{eq:primal}
+\begin{equation}\label{eq:ae}
 \min_{\theta_f, \theta_g}\sum\limits_{x_i \in X}{L(x_i, g(f(x))}
 \end{equation}
 
@@ -81,12 +81,12 @@ Architecture of stacked autoencoder is presented on figure \ref{fig:sae}
   \label{fig:sae}
 \end{figure}
 
-In subsection \ref{cha:dcae} we discuss techniques specificly usefull in computer vision.
+In subsection \ref{ch:dcae} we discuss techniques specificly usefull in computer vision.
 That includes application of convolutional layers and mixing training data with random noise
-Subsection \ref{cha:sae} describes possible modifications of the learning objective.
+Subsection \ref{ch:sae} describes possible modifications of the learning objective.
 
 
-\subsection{Autoencoders and computer vision}\label{cha:dcae}
+\subsection{Autoencoders and computer vision}\label{ch:dcae}
 
 Selecting a suitable model for computer vision task can be a tedious process.
 Input data is often higly dimensional and contains hundreds of thousands of features for each input \ref{ILSVRC15}.
@@ -117,7 +117,7 @@ Recent trends are clearly skewed towards convolutional models \cite{He2015, Szeg
 Convolutional models are consistently showing best results in computer vision competitions \cite{ILSVRC15, Zhou2016}.
 
 Convolutional and maxpooling layers provide means of dimensionality reduction.
-As described in section \ref{cha:cnn}, applying strided convolutions or pooling layers leads to decreese in resolution of the feature map.
+As described in section \ref{ch:cnn}, applying strided convolutions or pooling layers leads to decreese in resolution of the feature map.
 Therefore convolutional and maxpooling layers are natural candidates for feature extraction in encoder network.
 
 Convolutional networks depend on relatively small number of parameters.
@@ -176,23 +176,33 @@ In other words, pooling allows higher lever features to recognize a face by pres
   \label{fig:pool}
 \end{figure}
 
-To address this issue unpooling layer is introduced. Instead of using information about only maximum value of the feature in the region, unpooling layer also uses information about positioning of the feature. It means that each unpooling layer must correspond to a pooling layer with the same input and output size. Additionally, during pooling information about position of maximum values must be extracted and stored. Application of unpooling layer is illustrated on figure \ref{fig:unpool}.
+To address this issue unpooling layer is introduced. Instead of using information about only maximum value of the feature in the region, unpooling layer also uses information about positioning of the feature. This positional information is called a mask. To every pooled value $x_{i,j}$ corresponds a single mask of size equal to pooling region size. To use mask information  unpooling layer take as an input volume with the same shape as produced by pooling layer. As follows, pooling layer describe in section \ref{ch:cnn} must also extract information about position of maximum value. This modification does not otherwise effect the layer neather during forward nor during backward pass. Application of unpooling layer is illustrated on figure \ref{fig:unpool}.
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{unpool.png}
-  \caption{Pooling layer and unpooling operation.}
+  \caption{Illustration of pooling and unpooling layers.}
   \label{fig:unpool}
 \end{figure}
 
-Unpooling layers contain no parameters and are not effected by backpropagation. At the same time, since masks extracted in the pooling layers are ordered, it might effect features features of preceeding unpooling deconvolutional layers. Idealy,
+Unpooling layers contain no parameters and is not effected by backpropagation.
+
+It worth noting, that mask information extracted by modified pooling layer depends on order of feature channels. As stated by the authors of the original algorithm, this might affect features, extracted by layers preceeding unpooling \cite{Zhao2015}.
 
 \subsubsection{What-Where autoencoders}
 
 
 
-\subsection{Meaningfull feature selection}\label{cha:sae}
-\subsubsection{Sparce Autoencoders}\label{cha:vae}
-\subsubsection{Variational Autoencoders}\label{cha:vae}
-% \subsection{Generative adcersarial nets}\label{cha:gan}
+\subsection{Meaningfull feature selection}\label{ch:sae}
+
+Standalone objective \ref{eq:ae} of autoencoder is not particulary usefull.
+In this section we are going to describe specific usecases of aplying autoencoders along with required modification of objective function.
+
+\subsubsection{Sparse Autoencoders}\label{ch:vae}
+
+One of the first application of autoencoders in deep learning was using them as base for classification
+
+
+\subsubsection{Variational Autoencoders}\label{ch:vae}
+% \subsection{Generative adcersarial nets}\label{ch:gan}
 % \section{Autoencoders and feature interpretability}
