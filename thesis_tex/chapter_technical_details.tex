@@ -27,7 +27,16 @@ An autoencoder or autoassociator neural network is an unsupervised learning algo
 Autoencoders are usually trained according to \textit{encoder-decoder} paradigm.
 Which first allows to project or encode input $x_i$ into some usefull feature representaiton $h_i$.
 Then reconstruct or decode original input $\hat{y_i}$ from representation $h_i$.
-This process is schematically on image 1.
+This process is schematically on image \ref{fig:ae}.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{ae.png}
+  \caption{Autoencoder.}
+  \label{fig:ae}
+\end{figure}
+
+
 
 We are going to refer to encoder as a deterministic differentiable function $f(x, \theta_f)$ that for a given set of parameters $\theta_f$ maps input $x\in \Bbb{R}^d$ into representation $h \in \Bbb{R}^{d'}$.
 Likewise, decoder is deterministic differentiable function $g(h, \theta_g)$ depending on parameters $\theta_g$ maps $h\in\Bbb{R}^{d'}$ into $y\in \Bbb{R}^d$. We will further avoid specifing parameters $\theta_f$ and $\theta_g$ for simplicity.
@@ -39,7 +48,7 @@ Given a loss function $L$, for a datset $X=\{x_0, ..., x_i\}$ we can define lear
 
 Learning identity mapping itself is not particulaly usefull.
 Instead we are often interested in reusing only parts of the autoencoder.
-Encoder parameters $\theta_f$ can be used as initialization of a dicriminative model \cite{Masci2011, Vincent2010, Zhao2015}.
+For example, parameters of the encoder $\theta_f$ can serce as a good initialization of a dicriminative model \cite{Masci2011, Vincent2010, Zhao2015}.
 Such initialization results in minor yet coherent improvement of generalization properties of the model.
 Variational Autoencoders, on the other hand, reuse decoder as a generator of new training examples \cite{Kingma2013}.
 Extracted features $h$ can represent interpretable properties of the input and can be used to adjust this
@@ -62,16 +71,128 @@ In this approach, instead of directly mapping $h=f(x)$ and $y=g(h)$ into desired
 Stacked autoencoder can be trained in layerwise manner.
 In this case first mappings $y=g_0(h_0)$ and $h_0=f_0(x)$ are trained.
 Then follows training of mappings $y_1=g_1(h_1)$ and $h_1=f_0(h_0)$ and so forth.
-Architecture of stacked autoencoder is presented on figure
+Architecture of stacked autoencoder is presented on figure \ref{fig:sae}
 % \ref{fig}
 
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{sae.png}
+  \caption{Stacked autoencoder.}
+  \label{fig:sae}
+\end{figure}
+
+In subsection \ref{cha:dcae} we discuss techniques specificly usefull in computer vision.
+That includes application of convolutional layers and mixing training data with random noise
+Subsection \ref{cha:sae} describes possible modifications of the learning objective.
 
 
-\subsection{Denoising Autoencoders}\label{cha:dae}
+\subsection{Autoencoders and computer vision}\label{cha:dcae}
+
+Selecting a suitable model for computer vision task can be a tedious process.
+Input data is often higly dimensional and contains hundreds of thousands of features for each input \ref{ILSVRC15}.
+Model has to be flexible enough to address the issue of higly nonlinear relation between input features.
+At the same time it has to be highly invariant to position of visual features, spatial transformations and noisy data.
+All of this requirments lead to increased of model complexity.
+
+In this subsection we discuss the means of increasing generalization properties of complex computer vision models and modification, more specific to autoencoders.
+
+\subsubsection{Denoising autoencoders}
+
+Learning high capacity models is prone to overfitting.
+One of the common ways to decrease overfitting and make model learn usefull features without actually changing the model is learning on a larger training corpus.
+
+Denoising autoencoder approach \ref{Vincent2010} allows to increase variation in traing data by adding random noise to images. We construct input examples by adding random noise to the dataset acording to some parameter $alpha$: $\hat{x}=noise(x, \alpha)$.
+Denoising autoencoder is yet supposed to reconstruct  the original image $L(x, g(f(\hat{x})))$.
+This approach expects encoded representation to be stable and robust under condition of input corruption.
+It also expects that denoising taks would result in learning useful structure of input distribution.
+Denoising autoencoders are reported to allow better generaliation, when encoded features are provided to another model to perform classification task.
+
+\subsubsection{Convolutional autoencoders}
+
+One of the issues commonly encountered in computer vision tasks is spatial correlation of the data.
+Neigbouring pixels of a single image are rarely fully independent.
+Fully-connected networks are ill-fitted for addressing such local correlation of data.
+Futrhermore, high dimensionality of computer vision data results in overparametrization of such models and leads to overfitting.
+Recent trends are clearly skewed towards convolutional models \cite{He2015, Szegedy2016}.
+Convolutional models are consistently showing best results in computer vision competitions \cite{ILSVRC15, Zhou2016}.
+
+Convolutional and maxpooling layers provide means of dimensionality reduction.
+As described in section \ref{cha:cnn}, applying strided convolutions or pooling layers leads to decreese in resolution of the feature map.
+Therefore convolutional and maxpooling layers are natural candidates for feature extraction in encoder network.
+
+Convolutional networks depend on relatively small number of parameters.
+This quality is desirable for learning usefull feature mapping since it allows to avoid overfitting and, as a result, learning of identity mapping by the network.
+As described, number of parameters of convolutional layer depends only on kernel size and depth of the feature map.
+Number of parameters required by pooling layers is relatively small if not zero and does not depend on the size of the input.
+
+\subsubsection{Deconvolutional layers and input reconstruction}
+
+While convolutional layers are natural for feature extraction in encoder, reconstruction of highly dimensional input requires a different technique.
+One approach is to use an inverse-like operation to convolution.
+Deconvolution layer, also known as transposed convolution, is one possible approach.
+
+Deconvolutional layers \cite{Zeiler2010} take as an input an image $y$ composed of $K_0$ color channels $y_1, ... , y_{K_0}$.
+As a result of deconvolution process we would like obtain $K_1$ feature maps of the same image.
+We can represent each cahnnel $c$ of $K_0$ channels as $K_1$ channels convolved with feature maps $f_{k,c}$:
+
+\begin{equation}\label{eq:de}
+  \sum^{K_1}_{k=1}=z^i_k \cdot f_{k,c} = y^i_{k,c}
+\end{equation}
+
+where $\cdot$ is a dot product.
+
+Using this equation we would like to find latent feature maps $f_{k,c}$.
+Since equation \ref{eq:de} is an under-dertermined and allows multiple solution.
+Therefore a regularization term $z^i_k$ is added to incourage sparcity of the solutions.
+With sparcity term we can express the cost function $C$ for input $y_i$:
+
+\begin{equation}\label{eq:dec}
+    C(y_i) = \frac{\lambda}{2} \sum^{K_o}_{c=1} ||\sum^{K_1}_{k=1}{z^i_k \cdot f_{k,c} - y^i_{k,c}}||^2_2 + \sum^{K_1}_{k=1}{|z^i_k|^p}
+\end{equation}
+
+where we assume mean square error as a reconstruction cost and $p$ as regularization norm.
+Constant $\lambda$ balances contributions to the total cost between reconstruction and regularization terms.
+
+Problem \ref{eq:dec} for siplicity can be decomposed into 2 sequential quadratic problems and solved using stochastic gradient descent method.
+
+\subsubsection{Unpooling layers}
+
+Like with convolutional layers, applying pooling layers results in change of shape of feature map.
+In this subsection we describe a method that allows to effectivey revert max-pooling layer preserving relative spatial position of extracted features as on original image.
+
+As described in section \ref{ch:cnn} maxpooling layer with stride $k$.
+Applying this layers allows to reduce size of feature map $k^2$ times while preserving arguable most important information about extracted features.
+Max-pooling is crutial for convolutional neural networks for achieving position tollerance.
+
+Inverse operation of max-pooling is not well defined, since maximum value must be placed somewhere inside original volume of size $k^2$. Naively, we can choose an index of a cell index inside projection volume and put maximum values uniformly into cells with that index.
+This procedure is depicted on figure \ref{fig:pool}.
+However, this approach destroes relative positioning of unpooled features.
+In other words, pooling allows higher lever features to recognize a face by presense of a nose and a mouse within neigbouring smaller regions, naive unpooling might place both this features into the same region on the image.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{pool.png}
+  \caption{Pooling layer and naive inverse operation.}
+  \label{fig:pool}
+\end{figure}
+
+To address this issue unpooling layer is introduced. Instead of using information about only maximum value of the feature in the region, unpooling layer also uses information about positioning of the feature. It means that each unpooling layer must correspond to a pooling layer with the same input and output size. Additionally, during pooling information about position of maximum values must be extracted and stored. Application of unpooling layer is illustrated on figure \ref{fig:unpool}.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{unpool.png}
+  \caption{Pooling layer and unpooling operation.}
+  \label{fig:unpool}
+\end{figure}
+
+Unpooling layers contain no parameters and are not effected by backpropagation. At the same time, since masks extracted in the pooling layers are ordered, it might effect features features of preceeding unpooling deconvolutional layers. Idealy,
+
+\subsubsection{What-Where autoencoders}
 
 
 
-\subsection{Sparce Autoencoders}\label{cha:sae}
-\subsection{Variational Autoencoders}\label{cha:vae}
-\subsection{Generative adcersarial nets}\label{cha:gan}
-\section{Autoencoders and feature interpretability}
+\subsection{Meaningfull feature selection}\label{cha:sae}
+\subsubsection{Sparce Autoencoders}\label{cha:vae}
+\subsubsection{Variational Autoencoders}\label{cha:vae}
+% \subsection{Generative adcersarial nets}\label{cha:gan}
+% \section{Autoencoders and feature interpretability}
