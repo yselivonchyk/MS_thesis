@@ -193,16 +193,48 @@ It worth noting, that mask information extracted by modified pooling layer depen
 
 
 
-\subsection{Meaningfull feature selection}\label{ch:sae}
+\subsection{Extracting usefull features with Autoencoders}\label{ch:sae}
 
 Standalone objective \ref{eq:ae} of autoencoder is not particulary usefull.
 In this section we are going to describe specific usecases of aplying autoencoders along with required modification of objective function.
 
 \subsubsection{Sparse Autoencoders}\label{ch:vae}
 
-One of the first application of autoencoders in deep learning was using them as base for classification
+Lets consider activations in the hidden layer $h$ for some input $x$:
+\begin{equation}
+  h(x) = \sigma(W_{h}x_{-1} + b_{h})
+\end{equation}
+where $W_h$ and $b_h$ are paremeters of hidden layer $h$, $x_{-1}$ is output of the previous hidden layer and $\sigma$ is some activation function.
+For example for sigmoid activation function every component of vector $h(x)$ would belong to interval $[0, 1]$.
+Sparse autoencoders introduce additional term $l_{sparse}$ to loss function to add a constrain on the activations of the hidden layer $h$ \cite{Ng2011}:
+\begin{equation}
+  l_{total}(x) = l_{reconstruction}(x, g(f(x))) + \alpha*l_{sparse}(x, h(x))
+\end{equation}
+where $\alpha$ is a constant parameter.
 
+Sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the hidden layer:
+
+\begin{equation}\label{eq:avgh}
+  \rho = \sum_{i=1}^N h_i(x)/N
+\end{equation}
+
+For example, lets take a look at the case for sigmoid activation function in the hidden layer.
+Sigmoid produces outputs in the interval $[0, 1]$. If we can guarantee average activation on the hidden layer $\hat{\rho} <= 0.1$ we can rely upon the fact that no more than $10\%$ of hidden neurons would have activatoin close to $1.0$.
+
+Sparse constrain is usefull since in allows to extract usefull features even for relatively high number of hidden units. Specifically, decoder must be able to reconstruct original representaion relying only on few high activation on the hidden layer.
+
+There are several ways to enforce sparcity constrain.
+It is possible to perform gradient discent directly for fixed value of $\hat{\rho}$ but we would have to perform a second pass over the dataset to calculate actual value of $\rho$. Insted we can simply nulify all but $k$ highest activation during the forward path through the network \cite{Kulkarni2015}.
+Or apply negative log-likelyhood to the hidden layer of the network \cite{Zhao2015}.
+At last, to achieve true zero values on the hidden layer we can use absolute value penalty $l_{sparce}=\sum_{i=1}^N |h_i|$ in conjunction with rectifier linear unit activation function \cite{Glorot2011}.
+
+Sparse codding of the data has proven to be usefull to solve classification problem.
+In particular, for classification task requires us to assign one of $C$ exclusive classes we can train an autoencoder with $C$ hidden units. Once training converges we expect that features, learned by the hidden layer would somewhat corrspond to classes of taks. We can then use encoder part of the network as initialization of a classifier of the same architecture \cite{Masci2011}.
+Such initialization leads to consistently better generalization results after supervised training of the classifier.
 
 \subsubsection{Variational Autoencoders}\label{ch:vae}
+
+
+
 % \subsection{Generative adcersarial nets}\label{ch:gan}
 % \section{Autoencoders and feature interpretability}
