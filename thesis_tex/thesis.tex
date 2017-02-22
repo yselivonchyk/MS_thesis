@@ -9,6 +9,15 @@
 \graphicspath{{images/}}    % wo liegen die Bilder?
 \bibliography{library}  	% Angabe der BibTeX-Datei, % utf8-change
 
+\usepackage{tikz}
+\usepackage{subfigure}
+\usepackage{pgfplots}
+\usepackage[top=3cm,left=3cm,right=3cm,bottom=3cm]{geometry}
+% Scriptsize axis style.
+\pgfplotsset{every axis/.append style={tick label style={/pgf/number format/fixed},font=\scriptsize,ylabel near ticks,xlabel near ticks,grid=major}}
+
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
+
 % \usepackage{amsmath}
 %
 % \DeclareMathOperator*{\argminB}{argmin}

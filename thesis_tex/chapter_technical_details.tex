@@ -7,16 +7,110 @@ This chapter provides technical details relevant to the method proposed in chapt
 In subsection \ref{ch:nn} we provide overview of artificial neural networks and related optimization techniques.
 Subsection \ref{ch:ae} describes several unsupervised learning techniques for artificial neural networks also known as autoencoders.
 
-\section{Neural Networks}
+\section{Artificial Neural Networks}
 \label{ch:nn}
+An artificaial neural network is a methematical model that loosly resembling biological brain structure.
+
+An artificial neural network is a mathematical model inspired by biological brain structure.
+A neural network comprises of a set of interacting computational units, called neurons.
+In practise, neurons' computation contains a linear transformation of inputs followed by an activation function.
+Sigmoid, ReLU and identity functions are among most commonly used activation function.
+
+Neural networks are organized in layers.
+A layer can be viewed as a set of neurons that rely on same inputs and have similar behaviour i.e. activation function, output size, regularization parameters.
+We also distinguish auxilary layers that perform some transformation of the input data.
+Scaling layer, applying non-liniarity function and pooling layer are one of many examples of such layes.
+
+Major neural networks groups are distinguished between each other by structure of connections between neurons.
+Feedforward neural networks prohibit cyclic connection and loops in network structure, while Recurent neural networks have no such restiction.
+
+In subsection \ref{ch:ffnn} we are going to describe basic building blocks of feedforward neural network.
+Subsection \ref{ch:cnn} describes of a special case of feedforward neural network with parameter sharing.
+Finally, in subsection \ref{ch:opt} we deiscuss basis concepts of training artificial neural networks.
+
+% \subsection{Artificial Neural Network}
+\subsection{Feedforward Neural Networks}
+\label{ch:ffnn}
+
+Perceptron is a simplest example of single layer artificial neural network.
+Performs linear combination of input values $x$ and some constant value $b$ called \textit{bias} and applies some activation function $f$ to produce output:
+\begin{equation}\label{eq:per}
+  y = f(\sum_{i=1}^N W_ix_i + b) = f(Wx+b)
+\end{equation}
+where $W$ is a column vector of perceptron parameters and $f$ is an activation function. Structure of perceptron is depicted on figure \ref{fig:perc}.
+
+\input{auxilary/perceptron}
+
+By combining several perceptrons in one set we can produce multiple output values of $y$.
+For simplicity, we will stack parameters of $j$ multiple perceptrons that use the same input size $i$ into matrixes $W$ and $b$, where $W$ is rectrangular matrix of size $[i,j]$ and $b$ is a column vector of size $j$.
+In this case equation $\ref{eq:per}$ remains the same for column vector $y$ of size $j$. Set of perceptron-like neurons that perform computation on same input forms a single \textit{fully connected} layer of multilayer neural network.
+
+When we combine several layers together we would refer to inut vector $x$ as to \textit{input layer} and to last layer of the network producing final output $y$ as \textit{output layer}. All intermidiate layers between input and output are called \textit{hidden layers}.
+
+It has been shown, that artificial neural network under mild assumption about form of activation function can act as universal approximator even using single layer of hidden units of finite size \cite{Debao1993}.
+Even though single hidden layer must be enough for a large family of functions, it might take exponentially many units to performs such approximation \cite{Pascanu2014}.
+Hence, many researchers are developing neural networs with hundreeds of layers to allow more compact representation of complex functions \cite{He2015, Srivastava2015}.
+
+Expressivity of the functions that can be approximated by a neural network comes at a cost.
+Extensively complex models are prone to overfitting. Overfitting occuars when model learns from unimportant latent concepts in the input data.
+In other words, overlycomplex model is likely to learn distribution of noise in the input data instead of a useful concept.
+Overfitting leads to misleadingly high performance of the model on the training set but signifficantly lower solution qualities on yet unseen data.
+
+Collecting more data, regularizing the model and decreasing the complexity of the model are groups of techniques that allow to fight the overfitting.
+
+
+\input{auxilary/activation_functions}
 
 % \subsection{Artificial Neural Network}
 \subsection{Convolutional Neural Networks}
 \label{ch:cnn}
 
-\subsection{Optimization techniques}
-\subsection{Regularization}
+Convolutional neural network is a special kind of feedforward neural network that takes advantage of structural organization of the data. This technique allows to decrease number of parameters of the model when applied to structured data.
 
+Many types of data contain redundant information .i.e. information that, when ignored, can be recovered from the remaining data.
+For instance, we can rather easily reconstruct skipped word in the sentence "Clouds are in the \_\_" as well as we can recognize an object on an image even if some pixels are altered or missing.
+In other words, components of textual or visual data are highly spacially correlated.
+
+Convulutional neural network uses small spacially adjascent parts of data as an input to computational unit. Additionally, computational units that are applied to different pathces can use same set of parameters $K$ called \textit{convoutional kernel} to reduce complexity of the model. A computational unit depending on some kernel $K$ is called a \textit{convolutional filter}. A set of output produced by a single convolutional filter is called a \textit{feature map}.
+
+
+
+For an image $I$ of size $H \times W \times C$, where $H$,$W$,$C$ are width, height and number of color channels correspondingly, applying convolutional filter $K$ of size $w \times h$ would result in a feature map of size $(H-h+1) \times (W-w+1) \times 1$. Convolution operation can be described as:
+\begin{equation}\label{eq:conv}
+  (I \cdot K)_{x, y} = \sum_a \sum_b K_{a,b} I_{x+a, y+b}
+\end{equation}
+where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convolution correspondingly and next constrains apply
+\begin{equation*}
+  \begin{align}
+  &1 <=  x <= H-h+1, \\
+  &1 <=  y <= W-w+1, \\
+  &1 <=  a <= h, \\
+  &1 <=  b <= w
+  \end{align}
+\end{equation*}
+
+\begin{figure}
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{cnn.png}
+  \caption{Illustration of applying convolutional filter of size 3x3 to a single square patch. Output feature map is padded to preserve same shape as input data. Picture taken from [community.arm.com]}
+  \label{fig:cnn}
+\end{figure}
+
+In convolutional layer output of operation \ref{eq:conv}  is used with additional bias $b$.
+Sum $(I \cdot K)_{x, y}+b$ is called \texttt{preactivation} and is forwarded to activation function $f$.
+
+
+\subsubsection{Max-pooling layer}
+
+\subsection{Optimization techniques}
+\label{ch:opt}
+
+\subsubsection{Batch gradient descent}
+\subsubsection{Stochastic gradient descent}
+\subsubsection{Adam}
+
+\subsection{Regularization}
+\subsubsection{Dropout}
+\subsubsection{Data augmentation}
 
 
 
