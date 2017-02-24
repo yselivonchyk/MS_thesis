@@ -12,15 +12,19 @@
 \usepackage{tikz}
 \usepackage{subfigure}
 \usepackage{pgfplots}
+\usepackage{amsmath}
+\usepackage{amsmath,amssymb}
+\usepackage[]{algorithm2e}
 \usepackage[top=3cm,left=3cm,right=3cm,bottom=3cm]{geometry}
 % Scriptsize axis style.
+\usepackage{bookmark}
 \pgfplotsset{every axis/.append style={tick label style={/pgf/number format/fixed},font=\scriptsize,ylabel near ticks,xlabel near ticks,grid=major}}
 
 \usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
 
-% \usepackage{amsmath}
-%
-% \DeclareMathOperator*{\argminB}{argmin}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\E}{\mathbb{E}}
 
 %%%----------------------------------------------------------
 \begin{document}

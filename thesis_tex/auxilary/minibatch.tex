@@ -1,0 +1,26 @@
+% !TEX root = ../thesis.tex
+
+\begin{algorithm}[H]
+ \KwData{X, Y  \text{ (Train set)}}
+ \KwResult{$\theta \text{ (Learned weights)}$}
+
+ \Require{\textbf{Require: } \eta\text{: Stepsize}}
+
+ \Require{\textbf{Require: } \M\text{: Minibatch size}}
+
+ \State \theta \gets \theta_0 \text{ (Initialization)}
+
+ \While{not time to terminate}{
+  \State X_i, Y_i \gets \text{Select $M$ examples i.i.d. from $X, Y$}
+
+  \State \triangle_\theta \gets \nabla_\theta J(\theta)(X_i, Y_i) \text{ (Calculate gradients)}
+
+  \State \theta \gets \theta - \eta \triangle_\theta\text{ (Update weights)}
+
+ }
+
+ \Return{\theta}
+
+ \caption{Stochastic gradient descent algorithm with minibatches}\label{alg:sbp}
+
+\end{algorithm}

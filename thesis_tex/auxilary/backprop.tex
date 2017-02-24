@@ -1,0 +1,22 @@
+% !TEX root = ../thesis.tex
+
+\begin{algorithm}[H]
+ \KwData{X, Y  \text{ (Train set)}}
+ \KwResult{$\theta \text{ (Learned weights)}$}
+ 
+ \Require{\textbf{Require: } \eta\text{: Stepsize}}
+
+ \State \theta \gets \theta_0 \text{ (Initialization)}
+
+ \While{not time to terminate}{
+  \State \triangle_\theta \gets \nabla_\theta J(\theta)(X, Y) \text{ (Calculate gradients)}
+
+  \State \theta \gets \theta - \eta \triangle_\theta\text{ (Update weights)}
+
+ }
+
+ \Return{\theta}
+
+ \caption{Gradient descent algorithm}\label{alg:bp}
+
+\end{algorithm}

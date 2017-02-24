@@ -95,18 +95,101 @@ where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convol
   \label{fig:cnn}
 \end{figure}
 
-In convolutional layer output of operation \ref{eq:conv}  is used with additional bias $b$.
+In convolutional layer output of operation \ref{eq:conv} is used with additional bias $b$.
 Sum $(I \cdot K)_{x, y}+b$ is called \texttt{preactivation} and is forwarded to activation function $f$.
-
 
 \subsubsection{Max-pooling layer}
 
-\subsection{Optimization techniques}
+Pooling layers effectivey reduce size of activation map.
+
+
+\subsection{Parameter learning}
 \label{ch:opt}
 
-\subsubsection{Batch gradient descent}
-\subsubsection{Stochastic gradient descent}
-\subsubsection{Adam}
+TODO: rework with empirical risk minimization in mind. introduce notioin of generalization error
+
+Even though a multilayer neural network can approximate large family of compact functions arbitrary well \cite{Debao1993}, finding the right parameters for such approximation is non-trivial.
+Lets consider some error function $L(y, f(x, \theta))$ that calculates error between expected values $y$ and output of the function $f$, realized by a neural network depending on parameters $\theta$. Finding the solution for general neural network is equivalent to solving next optimization problem:
+
+\begin{equation}\label{eq:optnn}
+  \hat{\theta} = J(\theta) = \argmin_{\theta \in \Bbb{R}^D} \frac{1}{N} \sum_{i=1}^{N} L(y_i, f(x_i, \theta))
+\end{equation}
+where $D$ is equivalent to number of parameters $||\theta||$ and $N$ is the size of the training set.
+
+Problem \ref{eq:optnn} in general case has no closed-form solution and finding optimal set of parameters $\hat{\theta}$ is an NP-hard problem \cite{Anandkumar16}.
+In practise, gradient descent methods are used to find good parametrization $\hat{\theta}$ of the neural network.
+
+Gradient descent methods suggests to iteratively update parameters $\theta_t$ each time taking a step $\eta$ towards the direction of a better solution $\theta_{t+1}=\theta_t - \eta \nabla_\theta \theta$ \cite{Cauchy1847}.
+We use vector partial derivatives $\nabla_\theta J(\theta)=\{ \frac{\partial J(\theta)}{\partial w_1}, \ldots, \frac{\partial J(\theta)}{\partial w_N} \}$ of function $J(\theta)$ at point $\theta_t$ as the the direction towards better solution. Gradient descent method requires both funcitons $L(y, \hat{y})$ and $f(x, \theta)$ to be differentiable. Note, that differentiablility of function $f(x, \theta)$ in $\theta$ implies differentiability of the activation fucntion \ref{eq:per}. Algorithm pseudocode is shown on listing \ref{alg:bp}.
+
+\input{auxilary/backprop}
+
+Gradient based methods do not guarantee to find the optimal solution.
+Traing can stop in a local minima ($\theta \leq \theta + \eta \delta | \forall \delta \text{ s.t. } |\delta|^2 \leq \epsilon$) or a saddle point.
+These cases are shown on figure \ref{fig:critical}.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{minmaxsaddle.png}
+  \caption{Critical points of a loss fucntion $f(x)$, where $x \in \Bbb{R}^2$.}
+  \label{fig:critical}
+\end{figure}
+
+In practise, solutions produced by gradient based methods has proven to have suttisfying qualities \cite{Szegedy2016,He2015}.
+This might be due to the properties of high-dimensional non-convex error surfaces. The study by Y.Dauphin et al. \cite{Dauphin14} concludes, that saddle points and local minima on such surfaces are very likely to be close to the global minima.
+
+\subsubsection{Stochastic gradient descent with minibatches}
+
+Algorithm \ref{alg:bp} requires full path through the complete training data on each iteration.
+This might be computationally wasteful for large datasets. Instead, we can perform optimization iteratively only considering subsets of the traingin set, drawn i.d.d. from the training set:
+
+\begin{equation*}\label{eq:sopt}
+  \begin{aligned}
+  & \frac{1}{N} \sum_{i=1}^{N} L(y_i, f(x_i, \theta)) = \E_{i \sim U(1,N) } L(y_i, f(x_i, \theta)) \\
+  & \E_{i \sim U(1,N) } L(y_i, f(x_i, \theta))= \frac{1}{M} \E_{m \sim U^M(1,N) } \sum_{i \in m} L(y_i, f(x_i, \theta))
+  \end{aligned}
+\end{equation*}
+
+As a resutl, we can use stochastic procedure of selecting $M$ inputs from training dataset to use in each training iteration.
+Subset of inputs selected this way are called \textbf{minibatches}. Updated algorithm is shown on listing \ref{alg:sbp}.
+
+\input{auxilary/minibatch}
+
+\subsubsection{Adam update rule}
+
+Training time of gradient descent based algorithm can be reduced by applying adaptive learning rates \cite{Kingma2015}.
+\textit{Adam update rule} or simply Adam is one of the algorithm that allow to reduce training time of gradient descent.
+
+Adam update rule maintains exponential moving average of the gradients $m_t$ and the squared gradient $v_t$.
+Hyperparameters $\beta_1, \beta_2$ set the exponential decay rates for both sets of variables.
+Update rule for exponential moving average is as follows:
+\begin{equation*}
+  \begin{aligned}
+    & m_t = \beta_1 \cdot m_{t-1} + (1-\beta_1) \cdot g_t \\
+    & v_t = \beta_2 \cdot v_{t-1} + (1-\beta_2) \cdot g_t^2
+  \end{aligned}
+\end{equation*}
+
+Variables $m_t$ and $v_t$ are estimating 1st and 2nd moments of the gradients.
+We can therefore rewrite update rule:
+\begin{equation}
+  \theta_t \gets \theta_{t-1} - \eta m_t / (\sqrt{v_t} + \epsilon)
+\end{equation}
+where $\epsilon$ is a small guard value that prevents divisor from getting to close to zero.
+
+Exponential moving averages $m_t$ and $v_t$ are initialized with zeros.
+This leads to zero-bias of the estimators during initial phase of the trainging.
+To accelerate learning process during first iterations of algorithm \ref{alg:sbp} a time dependent regularization is applied:
+\begin{equation*}
+  \begin{aligned}
+    & \hat{m} = m / (1-\beta_1^t) \\
+    & \hat{v} = v/(1-\beta_2^t)
+  \end{aligned}
+\end{equation*}
+
+Listing \ref{alg:adam} shows the full algorithm written in pseudocode.
+
+\input{auxilary/adam}
 
 \subsection{Regularization}
 \subsubsection{Dropout}
