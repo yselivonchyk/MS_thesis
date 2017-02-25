@@ -71,21 +71,22 @@ Many types of data contain redundant information .i.e. information that, when ig
 For instance, we can rather easily reconstruct skipped word in the sentence "Clouds are in the \_\_" as well as we can recognize an object on an image even if some pixels are altered or missing.
 In other words, components of textual or visual data are highly spacially correlated.
 
-Convulutional neural network uses small spacially adjascent parts of data as an input to computational unit. Additionally, computational units that are applied to different pathces can use same set of parameters $K$ called \textit{convoutional kernel} to reduce complexity of the model. A computational unit depending on some kernel $K$ is called a \textit{convolutional filter}. A set of output produced by a single convolutional filter is called a \textit{feature map}.
+Convulutional neural network uses small spacially adjascent parts of data as an neuron input. Multiple neurons reuse same set of parameters $K$, called \textit{kernel}, on distinct patches of the input. All convolutional neurons depending on same kernel $K$ form a \textit{convolutional filter}. A set of outputs produced by a single convolutional filter is called a \textit{feature map}.
 
 
 
-For an image $I$ of size $H \times W \times C$, where $H$,$W$,$C$ are width, height and number of color channels correspondingly, applying convolutional filter $K$ of size $w \times h$ would result in a feature map of size $(H-h+1) \times (W-w+1) \times 1$. Convolution operation can be described as:
+For a 3-dimensional image $I$ of size $H \times W \times C$, where $H$,$W$,$C$ are width, height and number of color channels correspondingly, applying 2-dimensional convolutional filter $K$ of size $w \times h$ would result in a feature map of size $(H-h+1) \times (W-w+1) \times 1$. Kernel $K$ would use $w \times h \times C$ parameters. Convolution operation can be described as:
 \begin{equation}\label{eq:conv}
-  (I \cdot K)_{x, y} = \sum_a \sum_b K_{a,b} I_{x+a, y+b}
+  (I \cdot K)_{x, y} = \sum_a \sum_b \sum_c K_{a,b,c} I_{x+a, y+b,c}
 \end{equation}
-where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convolution correspondingly and next constrains apply
+where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convolution correspondingly and next constrains apply:
 \begin{equation*}
   \begin{aligned}
   &1 \leq  x \leq H-h+1, \\
   &1 \leq  y \leq W-w+1, \\
   &1 \leq  a \leq h, \\
-  &1 \leq  b \leq w
+  &1 \leq  b \leq w, \\
+  &1 \leq  c \leq C.
 \end{aligned}
 \end{equation*}
 
@@ -95,15 +96,37 @@ where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convol
   \label{fig:cnn}
 \end{figure}
 
-In convolutional layer output of operation \ref{eq:conv} is used with additional bias $b$.
-Sum $(I \cdot K)_{x, y}+b$ is called \texttt{preactivation} and is forwarded to activation function $f$.
+To preserv width and hights of the feature map $(I \cdot K)$ we can pad input image with values along the edges. We can duplicate the same values or use zeros as a padding.
+Further, we can apply $k$ distinct convolutional filters to produce output volume of size $x \times y \times k$.
+
+Output of convolution \ref{eq:conv} is often summed with additional bias $b$.
+Bias is shared across all convolutional neurons depending on the same kernel.
+Value $(I \cdot K)_{x, y}+b$, called \texttt{preactivation}, is forwarded to activation function $\sigma$.
+
+Activation operation can be followed by a pooling opearion.
+Pooling replaces output of convolution layer with a summary statistics of nearby outputs.
+Max-pooling is one example of such operatoin.
 
 \subsubsection{Max-pooling layer}
 
-Pooling layers effectivey reduce size of activation map.
+Max-pooling is a pooling operation applied independently to every feature map.
+Max-pooling replaces the output of $\sigma((I \cdot K)_{x, y}+b)$ with a maximum value over a small region of size $w$, $h$ centered at point $(x,y)$.
 
+We can use convolutional and pooling operations in \texttt{strided} mode. When using strides instead of applying operation to every unique position $(x, y)$ we can skip over some indexes. Applying strides greater than $1 \times 1$ results in decrease in size of the feature map. For an image of size $H \times W \times C$ and max-pooling operation with stride $h \times w$ we can calculate size of the output feature map as follows $H_o \times W_o \times C $:
+\begin{equation*}
+  \begin{aligned}
+  & W_o = \ceil[\bigg]{\frac{W}{w}} \\
+  & H_o = \ceil[\bigg]{\frac{H}{h}} \\
+\end{aligned}
+\end{equation*}
 
-\subsection{Parameter learning}
+Downsampling is essantial to reduce computational complexity of the network.
+Downsampling with pooling layers improves positional tolerance of convolutional netowrks.
+Strided pooling is prefered to strided convolution operation for downsampling. Strided pooling layers shown to work better in practise, alegedly, due to greater ammount of valueable information preserved after downsampling.
+
+Max-pooling operation does not rely on any internal parameters. During training, position of the maximum element has to be stored. During backpropagation gradients are applied only to position of maximum value. Non-maximum elements of the input feature map do not contribute to the total error since they are not used by the upper layers of the network.
+
+\subsection{Network parameters learning}
 \label{ch:opt}
 
 TODO: rework with empirical risk minimization in mind. introduce notioin of generalization error
@@ -173,7 +196,7 @@ Update rule for exponential moving average is as follows:
 Variables $m_t$ and $v_t$ are estimating 1st and 2nd moments of the gradients.
 We can therefore rewrite update rule:
 \begin{equation}
-  \theta_t \gets \theta_{t-1} - \eta m_t / (\sqrt{v_t} + \epsilon)
+  \theta_t \gets \theta_{t-1} - \frac{\eta m_t}{\sqrt{v_t} + \epsilon}
 \end{equation}
 where $\epsilon$ is a small guard value that prevents divisor from getting to close to zero.
 
@@ -193,11 +216,28 @@ Algorithm requires memory overhead proportinal to the number of parameters $||\t
 \input{auxilary/adam}
 
 \subsection{Regularization}
+
+\subsubsection{Bagging}
 \subsubsection{Dropout}
-\subsubsection{Data augmentation}
 
+Applying ensemble of models guarantees to performe not worse that any of ensemble members but computational complexity of the training and evaluation grows learly with the size of ensemble. This might play a limiting factor on the size of ensembly, especially when training of even a single model is computationally expensive.
 
+Dropout technique allows to approximately achieve ensembly performance at relatively low computational overhead \cite{Srivastava2014}.
+Dropout authors propose to ignore a randomly chosen subset of non-output neurons during training. A new subset of units is selected for each minibatch or even for each training example.
 
+Training a model with dropout resembles training an ensemble of models. With correction, that models have similar architecutre and make use of the shared weights. Number of possible models indirectly trained with dropout is roughly exponential in number of non-output units, excluding models where connection between input and output units are broken. Ofcause, this models are not trained explicitly and only a small subset is even directly used during the training process. For dropout training we can update optimization problem \ref{eq:optnn} as follows:
+
+\begin{equation}\label{eq:optnndo}
+  \hat{\theta} = \argmin_{\theta \in \Bbb{R}^D} \E_\mu J(\theta, \mu) = \argmin_{\theta \in \Bbb{R}^D} \E_\mu \frac{1}{N} \sum_{i=1}^{N} L(y_i, f(x_i, \theta, \mu))
+\end{equation}
+where $\mu$ is a random mask.
+
+This way during the training process we minize value of $\E_\mu J(\theta, \mu)$ iteratively sampling masks $\mu$ and minimizing function $J(\theta, \mu)$ for this masks explicitly.
+
+To performe prediction with such a model we need to collect votes from eponential number of ensembly members.
+In pratise the following two methods are commonly used. First, alike during the training process, we can sample some constant number of masks $\mu$ and use majority vote on a small subset of functions $\{f(x, \theta, \mu_1), \ldots, f(x, \theta, \mu_N)\}$. Alternatively, it has been shown that simply multiplying the weight of the layers by keep probability provides a good approximation of stochastic evaluation \cite{Srivastava2014}. Later method requires only single forward through the network for each prediction.
+
+At last, dropout becomes especially usefull when it is hard to control actual model complexity. Developing or even finetuning a new task specific neural network architecture is a demanding process. It becomes more common to reuse an existing network  archtecture as Inception or ResNet \cite{He2015, Szegedy2016}. Even though number of parameters in this networks can be overwhelming for a particular task, rigorous regularization with dropout might be sufficient to achieve sutisfactory results.
 
 
 \section{Autoencoders}\label{ch:ae}
@@ -207,13 +247,8 @@ Which first allows to project or encode input $x_i$ into some useful feature rep
 Then reconstruct or decode original input $\hat{y_i}$ from representation $h_i$.
 This process is schematically on image \ref{fig:ae}.
 
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{ae.png}
-  \caption{Autoencoder.}
-  \label{fig:ae}
-\end{figure}
 
+\input{auxilary/ae}
 
 
 We are going to refer to encoder as a deterministic differentiable function $f(x, \theta_f)$ that for a given set of parameters $\theta_f$ maps input $x\in \Bbb{R}^d$ into representation $h \in \Bbb{R}^{d'}$.
@@ -258,6 +293,8 @@ Architecture of stacked autoencoder is presented on figure \ref{fig:sae}
   \caption{Stacked autoencoder.}
   \label{fig:sae}
 \end{figure}
+
+\input{auxilary/mlae}
 
 In subsection \ref{ch:dcae} we discuss techniques specifically useful in computer vision.
 That includes application of convolutional layers and mixing training data with random noise
