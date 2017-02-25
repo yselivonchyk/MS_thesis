@@ -81,12 +81,12 @@ For an image $I$ of size $H \times W \times C$, where $H$,$W$,$C$ are width, hei
 \end{equation}
 where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convolution correspondingly and next constrains apply
 \begin{equation*}
-  \begin{align}
-  &1 <=  x <= H-h+1, \\
-  &1 <=  y <= W-w+1, \\
-  &1 <=  a <= h, \\
-  &1 <=  b <= w
-  \end{align}
+  \begin{aligned}
+  &1 \leq  x \leq H-h+1, \\
+  &1 \leq  y \leq W-w+1, \\
+  &1 \leq  a \leq h, \\
+  &1 \leq  b \leq w
+\end{aligned}
 \end{equation*}
 
 \begin{figure}
@@ -186,8 +186,9 @@ To accelerate learning process during first iterations of algorithm \ref{alg:sbp
     & \hat{v} = v/(1-\beta_2^t)
   \end{aligned}
 \end{equation*}
+where $t$ is a variable tracking current iteration number.
 
-Listing \ref{alg:adam} shows the full algorithm written in pseudocode.
+Algorithm requires memory overhead proportinal to the number of parameters $||\theta||$. Listing \ref{alg:adam} shows the full algorithm of Adam update rule written in pseudocode.
 
 \input{auxilary/adam}
 
@@ -396,7 +397,7 @@ Sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the h
 \end{equation}
 
 For example, lets take a look at the case for sigmoid activation function in the hidden layer.
-Sigmoid produces outputs in the interval $[0, 1]$. If we can guarantee average activation on the hidden layer $\hat{\rho} <= 0.1$ we can rely upon the fact that no more than $10\%$ of hidden neurons would have activatoin close to $1.0$.
+Sigmoid produces outputs in the interval $[0, 1]$. If we can guarantee average activation on the hidden layer $\hat{\rho} \leq 0.1$ we can rely upon the fact that no more than $10\%$ of hidden neurons would have activatoin close to $1.0$.
 
 Sparse constrain allows to extract useful features even for relatively high number of hidden units. Specifically, decoder must be able to reconstruct original representation relying only on few high activation on the hidden layer.
 
