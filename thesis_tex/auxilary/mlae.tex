@@ -1,46 +1,54 @@
 % !TEX root = ../thesis.tex
 
-% \begin{figure}[h!]
-%   % \centering
-%     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{ae.png}
-%   \caption{Autoencoder.}
-%   \label{fig:ae}
-% \end{figure}
-
-
 \begin{figure}
-  \tikzstyle{block} = [draw,minimum size=2em]
-  \tikzstyle{data} = [draw,shape=circle,minimum size=2em]
 
+\centering
+\begin{tikzpicture}
+  [
+    state/.style={draw, rectangle, minimum width=6mm, minimum height=6mm, inner sep=2pt},
+    func/.style={draw, circle, minimum width=1cm, minimum height=1cm, inner sep=2pt},
+    loss/.style={draw, diamond, minimum width=1cm, minimum height=1cm, inner sep=2pt},
+    node distance=20mm,
+    classical/.style={dashed,->,shorten >=4pt,shorten <=4pt,>=stealth},
+%     dotted/.style={dotted,-,shorten >=4pt,shorten <=4pt,>=stealth}
+  ]
+  \node (x) [state, label=left:Input] {$x$};
+  \node (f1) [func, below of=x,label=left:Encoder 1] {$f_1(x)$};
+  \node(h1)[state, below of=f1]{$h_1$};
+  \node (f2) [func, below of=h1,label=left:Encoder 2] {$f_2(x)$};
+  \node (fn) [func, below of=f2,label=left:Encoder $n$] {$f_n(x)$};
 
-  % diameter of semicircle used to indicate that two lines are not connected
-  \def\radius{.7mm}
-  \tikzstyle{branch}=[fill,shape=circle,minimum size=3pt,inner sep=0pt]
+  \node(hn)[state, below of=fn, right of=fn,label=left:Features]{$h_n$};
 
-  \begin{tikzpicture}[>=latex']
-  \node[data] at (0,0) (input) {C};
-  \node[block] at (1.2,0) (l1) {$Linear$};
-  \draw[->] (input) -- (l1);
-  \node[block] at (2.8,0) (unpool2) {$Unpool_2$};
-  \draw[->] (l1) -- (unpool2);
-  \node[block] at (4.4,0) (dconv3) {$DConv_3$};
-  \draw[->] (unpool2) -- (dconv3);
-  \node[block] at (5.9,0) (relu3) {$ReLU$};
-  \draw[->] (dconv3) -- (relu3);
-  \node[block] at (7.4,0) (unpool1) {$Unpool_1$};
-  \draw[->] (relu3) -- (unpool1);
-  \node[block] at (9,0) (dconv2) {$DConv_2$};
-  \draw[->] (unpool1) -- (dconv2);
-  \node[block] at (10.5,0) (relu2) {$ReLU$};
-  \draw[->] (dconv2) -- (relu2);
-  \node[block] at (12,0) (dconv1) {$DConv_1$};
-  \draw[->] (relu2) -- (dconv1);
-  \node[block] at (13.5,0) (relu1) {$ReLU$};
-  \draw[->] (dconv1) -- (relu1);
-  \node[data] at (14.7,0) (output) {$\hat{\mathrm{I}}$};
-  \draw[->] (relu1) -- (output);
+  \node(gn)[func, above of=hn, right of=hn,label=right:Decoder $n$]{$g_n(h)$};
+  \node(g2)[func, above of=gn, label=right:Decoder 2]{$g_2(h)$};
+  \node(y1)[state, above of=g2]{$\hat{h}_1$};
+  \node(g1)[func, above of=y1,label=right:Decoder 1]{$g_1(h)$};
+  \node(y)[state, above of=g1, label=right:Reconstruction]{$y$};
 
-  \end{tikzpicture}
-\caption{Stacked autoencoder.}
-\label{fig:sae}
+  \node(l1)[loss, right of=x, label=below:Loss]{$L2$};
+  \node(l2)[loss, right of=h1, label=below:Loss]{$L2_2$};
+  \node(lnce)[loss, below of=hn, label=below:Sparsity penalty]{$L_{NCE}$};
+
+  \draw [->] (x) -- (f1);
+  \draw [->] (f1) -- (h1);
+  \draw [->] (h1) -- (f2);
+  \draw [dotted] (f2) -- (fn);
+  \draw [->] (fn) -- (hn);
+  \draw [->] (hn) -- (gn);
+  \draw [dotted] (gn) -- (g2);
+  \draw [->] (g2) -- (y1);
+  \draw [->] (y1) -- (g1);
+  \draw [->] (g1) -- (y);
+
+  \draw [classical] (l1) -- (x);
+  \draw [classical] (l1) -- (y);
+
+  \draw [classical] (l2) -- (h1);
+  \draw [classical] (l2) -- (y1);
+
+  \draw [classical] (lnce) -- (hn);
+\end{tikzpicture}
+\caption{Stacked autoencoders with euclidian distance as reconstruction loss and negative log-likelihood penalty to enforce sparsity of the extracted features.}
+\label{fig:mlae}
 \end{figure}
