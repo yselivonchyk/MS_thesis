@@ -55,6 +55,8 @@ To reduce overfitting several techniques can be used. Reducing model capacity, c
 
 Using convolutional neural networks is one of the options to reduce capacity of the model by using shared model weights.
 
+Xaviere initializatin \cite{Glorot2010}
+
 \input{auxilary/activation_functions}
 
 % \subsection{Artificial Neural Network}
@@ -240,9 +242,9 @@ At last, dropout becomes especially useful when it is hard to control the actual
 
 \section{Autoencoders}\label{ch:ae}
 An autoencoder or an autoassociator neural network is an unsupervised learning algorithm that sets target output values equal to input values $y_i=x_i$ \cite{Ng2011,RanzatoMarcAurelio2007}.
-Autoencoders are usually trained according to \textit{encoder-decoder} paradigm.
+Autoencoders are usually trained according to the \textit{encoder-decoder} paradigm.
 Which first allows to project or encode input $x_i$ into some useful feature representation $h_i$.
-Then reconstruct or decode original input $\hat{y_i}$ from representation $h_i$.
+Then reconstruct or decode the original input $\hat{y_i}$ from representation $h_i$.
 This schematically depicted on figure \ref{fig:ae}.
 
 
@@ -250,14 +252,14 @@ This schematically depicted on figure \ref{fig:ae}.
 
 
 We are going to refer to encoder as a deterministic differentiable function $f(x, \theta_f)$ that for a given set of parameters $\theta_f$ maps input $x\in \Bbb{R}^d$ into representation $h \in \Bbb{R}^{d'}$.
-Likewise, decoder is deterministic differentiable function $g(h, \theta_g)$ depending on parameters $\theta_g$ maps $h\in\Bbb{R}^{d'}$ into $y\in \Bbb{R}^d$. We will further avoid specifying parameters $\theta_f$ and $\theta_g$ for simplicity.
-Given a loss function $L$, for a dataset $X=\{x_0, ..., x_i\}$ we can define learning objective as follows \cite{Good2016}:
+Likewise, the decoder is a deterministic differentiable function $g(h, \theta_g)$ depending on parameters $\theta_g$, that maps $h\in\Bbb{R}^{d'}$ into $y\in \Bbb{R}^d$. We will further avoid specifying parameters $\theta_f$ and $\theta_g$ for simplicity.
+Given a loss function $L$, for a dataset $X=\{x_0, ..., x_i\}$ we can define the learning objective as follows \cite{Good2016}:
 
 \begin{equation}\label{eq:ae}
 \min_{\theta_f, \theta_g}\sum\limits_{x_i \in X}{L(x_i, g(f(x))}
 \end{equation}
 
-Learning identity mapping itself is not particularly useful.
+Learning the identity mapping itself is not particularly useful.
 Instead we are often interested in reusing only parts of the autoencoder.
 For example, parameters of the encoder $\theta_f$ can serve as a good initialization of a discriminative model \cite{Masci2011, Vincent2010, Zhao2015}.
 Such initialization results in minor yet coherent improvement of generalization properties of the model.
@@ -265,24 +267,24 @@ Variational Autoencoders, on the other hand, reuse decoder as a generator of new
 Extracted features $h$ can represent interpretable properties of the input and can be used to adjust this
 properties during generation process \cite{Kulkarni2015, Whitney2016}.
 
-Learning useful feature representation is not a trivial task.
-One of the common issues with training autoencoders is possibility to learn identity mapping of input data.
-Learning identity mapping would result in less informative feature representation of the inputs.
+Learning useful feature representations is not a trivial task.
+One of the common issues with training autoencoders is the possibility to learn an identity mapping of input data.
+Learning an identity mapping would result in less informative feature representation of the inputs.
 For example, we can represent both encoder and decoder as a linear function and set the size of the feature space so that it exceeds the size of input space $d' > d$.
-Then components of autoencoder can both learn simple identity mapping from input space into feature space and wise-versa.
-Therefore, it is common to either limit capacity of the feature space to be less than input space or impose additional regularization on extracted features.
+Then components of autoencoder can both learn simple identity mappings from input space into feature space and vise versa.
+Therefore, it is common to either limit the capacity of the feature space to be less than the input space or impose additional regularization on the extracted features.
 
-Additionally, both encoder and decoder can be represented as arbitrary neural network.
-If capacity of any of two networks is hight enough, it would again lead to learning of identity mapping.
-On the other hand, if capacity is chosen too low it can hurt the learning process.
-For example, low capacity of generator network in Variational Autoencoders can result in mode collapse.
+Additionally, both encoder and decoder can be represented as arbitrary neural networks.
+If the capacity of any of the two networks is high enough, it would again lead to learning of an identity mapping.
+On the other hand, if the capacity is chosen too low it can hurt the learning process.
+For example, low capacity autoencoders are prone to \textit{mode collapse}, when model produces the same output regardless of the input data \cite{Radford2015}.
 
 One of the ways to address the problem of overly high capacity of components can be using stacked autoencoders.
 In this approach, instead of directly mapping $h=f(x)$ and $y=g(h)$ into desired lower-dimensional space multiple intermediate mappings can be used $h_i=f_i(h_{i-1})$ and $\hat{h}_i=g_{i+1}(h_{i+1})$.
 Stacked autoencoder can be trained in layer-wise manner.
-In this case first mappings $y=g_0(h_0)$ and $h_0=f_0(x)$ are trained.
+In this case first the mappings $y=g_0(h_0)$ and $h_0=f_0(x)$ are trained.
 Then follows training of mappings $y_1=g_1(h_1)$ and $h_1=f_0(h_0)$ and so forth.
-Architecture of stacked autoencoder is shown on figure \ref{fig:sae}
+The architecture of stacked autoencoder is shown on figure \ref{fig:sae}
 % \ref{fig}
 
 \input{auxilary/mlae}
@@ -291,12 +293,12 @@ Architecture of stacked autoencoder is shown on figure \ref{fig:sae}
 \subsection{Autoencoders in computer vision}\label{ch:dcae}
 
 In this subsection we discuss unsupervised learning techniques specific to vision tasks.
-First, we describe usage of convolutional layers in autoencoders \ref{ch:cae} and data augmentation \ref{ch:denae}.
+First, we describe the usage of convolutional layers in autoencoders \ref{ch:cae} and data augmentation \ref{ch:denae}.
 Subsection \ref{ch:mod_ae} describes possible modifications of learning objective in autoencoders.
 
 Computer vision tasks often have to work with noisy, highly correlated and very high dimensional data. Input size can grow to thousands of features per input example \ref{ILSVRC15}.
 Computer vision models have to account for highly nonlinear relation between input features.
-Learned concepts have to be highly tolerant to position of the features on the image grid and be capable to work with spatially transformed and noisy data.
+Learned concepts have to be highly tolerant to the position of the features on the image grid and be capable to work with spatially transformed and noisy data.
 This requirements generally lead to increase in model complexity.
 
 In this subsection we discuss the means of increasing generalization properties of complex computer vision models and modification, more specific to autoencoders.
@@ -306,37 +308,37 @@ In this subsection we discuss the means of increasing generalization properties 
 Learning high capacity models is prone to overfitting.
 One of the common ways to decrease overfitting and make model learn useful features without actually changing the model is learning on a larger training corpus.
 
-Denoising autoencoder approach \ref{Vincent2010} allows to increase variation in training data by adding random noise to images. We construct input examples by adding random noise to the dataset according to some parameter $alpha$: $\hat{x}=n(x, \alpha)$.
-Denoising autoencoder is yet supposed to reconstruct  the original image $L(x, g(f(x)))$.
+Denoising autoencoders \ref{Vincent2010} allow to increase variation in training data by adding random noise to images. We construct input examples by adding random noise to the dataset according to some parameter $alpha$: $\hat{x}=n(x, \alpha)$.
+Denoising autoencoders are yet supposed to reconstruct  the original image $L(x, g(f(x)))$.
 This approach expects encoded representation to be stable and robust under condition of input corruption.
-It also expects that denoising tasks would result in learning useful structure of input distribution.
-Denoising autoencoders are reported to allow better generalization, when encoded network is used as initializer for classifier.
+It also expects that the denoising tasks would result in learning useful structure of the input distribution.
+Denoising autoencoders are reported to allow better generalization, when an encoded network is used as initializer for the classifier.
 
 \subsubsection{Convolutional autoencoders}\label{ch:cae}
 
 One of the issues commonly encountered in computer vision tasks is spatial correlation of the data.
 Neighboring pixels of a single image are rarely fully independent.
-Fully-connected networks are ill-fitted for addressing such local correlation of data.
+Fully-connected networks are ill-fitted for addressing such local correlations of the data.
 Furthermore, high dimensionality of computer vision data results in over-parametrization of such models and leads to overfitting.
-Recent trends are clearly skewed towards convolutional models \cite{He2015, Szegedy2016} that are consistently showing best results in computer vision competitions \cite{ILSVRC15, Zhou2016}.
+Recent trends are clearly skewed towards convolutional models \cite{He2015, Szegedy2016} that are consistently showing the best results in computer vision competitions \cite{ILSVRC15, Zhou2016}.
 
 Convolutional and max pooling layers provide means of dimensionality reduction.
-As described in section \ref{ch:cnn}, applying strided convolutions or pooling layers leads to decrease in resolution of the feature map.
+As described in section \ref{ch:cnn}, applying strided convolutions or pooling layers leads to a decrease in resolution of the feature map.
 Therefore convolutional and max pooling layers are natural candidates for feature extraction in encoder network.
 
-Convolutional networks depend on relatively small number of parameters.
-This quality is desirable for learning useful feature mapping since it allows to avoid overfitting and, as a result, learning of identity mapping by the network.
+Convolutional networks depend on a relatively small number of parameters.
+This quality is desirable for learning a useful feature mapping since it allows to avoid overfitting and, as a result, learning of an identity mapping by the network.
 As described in section \ref{ch:cnn}, number of parameters of convolutional layer depends only on kernel size and depth of the feature map.
-Number of parameters required by pooling layers is relatively small if not zero and does not depend on the size of the input.
+The number of parameters required by pooling layers is relatively small if not zero and does not depend on the size of the input.
 
 \subsubsection{Deconvolutional layers and input reconstruction}
 
-While convolutional layers are natural for feature extraction in encoder, reconstruction of highly dimensional input requires a different technique.
+While convolutional layers are natural for feature extraction in the encoder, reconstruction of highly dimensional input requires a different technique.
 One approach is to use an inverse-like operation to convolution.
 Deconvolution layer, also known as transposed convolution, is one possible approach.
 
 Deconvolutional layers \cite{Zeiler2010} take as an input an image $y$ composed of $K_0$ color channels $y_1, ... , y_{K_0}$.
-As a result of deconvolution process we would like obtain $K_1$ feature maps of the same image.
+As a result of the deconvolution process we would like to obtain $K_1$ feature maps of the same image.
 We can represent each channel $c \in [1, \ldots, K_0]$ as $K_1$ channels convolved with feature maps $f_{k,c}$ \ref{eq:conv}:
 
 \begin{equation}\label{eq:de}
@@ -346,7 +348,7 @@ We can represent each channel $c \in [1, \ldots, K_0]$ as $K_1$ channels convolv
 where $\cdot$ is a dot product.
 
 Using this equation we would like to find latent feature maps $f_{k,c}$.
-Since equation \ref{eq:de} is an under-determined and allows multiple solution.
+Since equation \ref{eq:de} is under-determined and allows multiple solutions.
 Therefore a regularization term $z^i_k$ is added to encourage sparsity of the solutions.
 With sparsity term we can express the cost function $C$ for input $y_i$:
 
@@ -356,21 +358,21 @@ With sparsity term we can express the cost function $C$ for input $y_i$:
 where we assume mean square error as a reconstruction cost and $p$ as regularization norm.
 Constant $\lambda$ balances contributions of the regularization term to the cost function.
 
-Problem \ref{eq:dec} for simplicity can be decomposed into 2 sequential quadratic problems and solved using stochastic gradient descent method seamlessly with backpropagation.
+Problem \ref{eq:dec} for simplicity can be decomposed into 2 sequential quadratic problems and solved using the stochastic gradient descent method seamlessly with backpropagation.
 
 \subsubsection{Unpooling layers}
 
 Like with convolutional layers, applying pooling layers results in change of the shape of the feature map.
-In this subsection we describe a method that allows to effectively revert max-pooling layer preserving relative spatial position of extracted features as on original image.
+In this subsection we describe a method that allows to effectively revert max-pooling layer preserving the relative spatial position of extracted features as on original image.
 
-As described in section \ref{ch:cnn} max pooling layer with stride $k$.
-Applying this layers allows to reduce size of feature map $k^2$ times while preserving arguable most important information about extracted features.
-Max-pooling is crucial for convolutional neural networks for achieving position tolerance.
+In section \ref{ch:cnn} we described applying max pooling layer with some stride $k$.
+Applying these layers allows to reduce the size of the feature map up to $k^2$ times while preserving, arguably, most relevant information about the extracted features.
+Max-pooling is crucial to convolutional neural networks for achieving some position tolerance of the extracted features \cite{Jaderberg2015}.
 
-Inverse operation of max-pooling is not well defined, since maximum value must be placed somewhere inside original volume of size $k^2$. Naively, we can choose an index of a cell index inside projection volume and put maximum values uniformly into cells with that index.
+The inverse operation of max-pooling is not well defined, since the maximum value must be placed somewhere inside the original volume of size $k^2$. Naively, we can choose an index of a cell index inside projection volume and put maximum values uniformly into the cells with that index.
 This procedure is depicted on figure \ref{fig:pool}.
 However, this approach destroys relative positioning of unpooled features.
-In other words, pooling allows higher lever features to recognize a face by presence of a nose and a mouth within neighboring smaller regions, naive unpooling might place both this features into the same region on the image.
+In other words, pooling allows higher lever features to recognize a face by presence of a nose and a mouth within neighboring smaller regions, naive unpooling might place both these features into the same region on the image.
 
 \begin{figure}[h!]
   \centering
@@ -379,7 +381,18 @@ In other words, pooling allows higher lever features to recognize a face by pres
   \label{fig:pool}
 \end{figure}
 
-To address this issue unpooling layer is introduced. Instead of using information about only maximum value of the feature in the region, unpooling layer also uses information about positioning of the feature. This positional information is called a mask. To every pooled value $x_{i,j}$ corresponds a single mask of size equal to pooling region size. To use mask information  unpooling layer take as an input volume with the same shape as produced by pooling layer. As follows, pooling layer describe in section \ref{ch:cnn} must also extract information about position of maximum value. This modification does not otherwise effect the layer neither during forward nor during backward pass. Application of unpooling layer is illustrated on figure \ref{fig:unpool}.
+To address this issue an unpooling layer is introduced. Instead of using information about only the maximum value of the feature in the region, unpooling layers also use information about positioning of the feature. This positional information is called a mask. To every pooled value $x_{i,j}$ corresponds a single mask, indicating the position of the value $x_{i,j}$ inside the pulled volume. We can descripe unpooling operation $up(X, M)$ as follows:
+
+\begin{equation}\label{eq:unp}
+  \begin{aligned}
+    & Y = up(X, M),\text{ such that} \\
+    & \quad X \in \Bbb{R}^{W \times H \times C}, \\
+    & \quad Y \in \Bbb{R}^{kW \times kH \times C}, \text{ where $k$ is stride } \\
+    & \quad M \in \Bbb{J}^{W \times H \times C}, \text{ where $\Bbb{J}$ is a set of size $|\Bbb{J}|=k^2$ }
+  \end{aligned}
+\end{equation}
+
+As follows, pooling layers described in section \ref{ch:cnn} must also extract the information $M$ about the positions of maximum values. This modification does not otherwise effect the layer neither during forward nor during backward pass. Application of unpooling layers is illustrated on figure \ref{fig:unpool}.
 
 \begin{figure}[h!]
   \centering
@@ -388,9 +401,9 @@ To address this issue unpooling layer is introduced. Instead of using informatio
   \label{fig:unpool}
 \end{figure}
 
-Unpooling layers contain no parameters and is not effected by backpropagation.
+Unpooling layers contain no parameters and are not affected by backpropagation.
 
-It worth noting, that mask information extracted by modified pooling layer depends on order of feature channels. As stated by the authors of the original idea, this might have an affect on features, extracted by layers preceding unpooling \cite{Zhao2015}.
+It's worth noting, that mask information extracted by a modified pooling layer depends on the order of feature channels. As stated by the authors of the original idea, this might have an effect on features, extracted by layers preceding unpooling \cite{Zhao2015}.
 
 \subsubsection{What-Where autoencoders}
 
@@ -398,7 +411,7 @@ It worth noting, that mask information extracted by modified pooling layer depen
 
 \subsection{Extracting useful features with Autoencoders}\label{ch:mod_ae}
 
-Standalone objective \ref{eq:ae} of autoencoder is not particularly useful.
+The standalone objective \ref{eq:ae} of autoencoders is not particularly useful.
 In this section we are going to describe specific use-cases of applying autoencoders along with required modification of objective function.
 
 \subsubsection{Sparse Autoencoders}\label{ch:sae}
@@ -407,31 +420,31 @@ Lets consider activations in the hidden layer $h$ for some input $x$:
 \begin{equation}
   h(x) = \sigma(W_{h}x_{-1} + b_{h})
 \end{equation}
-where $W_h$ and $b_h$ are parameters of hidden layer $h$, $x_{-1}$ is output of the previous hidden layer and $\sigma$ is some activation function.
-Sparse autoencoders introduce additional term $l_{sparse}$ to loss function to add a constrain on the activations of the hidden layer $h$ \cite{Ng2011}:
+where $W_h$ and $b_h$ are parameters of a hidden layer $h$, $x_{-1}$ is the output of the previous hidden layer and $\sigma$ is some activation function.
+Sparse autoencoders introduce an additional term $l_{sparse}$ to the loss function to add a constrain on the activations of the hidden layer $h$ \cite{Ng2011}:
 \begin{equation}
   l_{total}(x) = l_{reconstruction}(x, g(f(x))) + \alpha*l_{sparse}(x, h(x))
 \end{equation}
 where $\alpha$ is a constant parameter.
 
-Sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the hidden layer:
+A sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the hidden layer:
 
 \begin{equation}\label{eq:avgh}
   \rho = \frac{1}{N} \sum_{i=1}^N h_i(x)
 \end{equation}
 
-For example, lets take a look at the case for sigmoid activation function in the hidden layer.
-Sigmoid produces outputs in the interval $[0, 1]$. If we can guarantee average activation on the hidden layer $\hat{\rho} \leq 0.1$ we can rely upon the fact that no more than $10\%$ of hidden neurons would have activation close to $1.0$.
+For example, let's take a look at the case for sigmoid activation function in the hidden layer.
+Sigmoid produces outputs in the interval $[0, 1]$. If we can guarantee an average activation on the hidden layer $\hat{\rho} \leq 0.1$ we can rely upon the fact that no more than $10\%$ of hidden neurons would have activation close to $1.0$.
 
-Sparse constrain allows to extract useful features even for relatively high number of hidden units. Specifically, decoder must be able to reconstruct original representation relying only on few high activation on the hidden layer.
+A sparse constrain allows to extract useful features even for relatively high number of hidden units. Specifically, a decoder must be able to reconstruct the original representation relying only on few high activation on the hidden layer.
 
-There are several ways to enforce sparsity constrain.
-It is possible to perform gradient descent directly for fixed value of $\hat{\rho}$. In that case we would have to perform a second pass over the dataset to calculate actual value of $\rho$ to be used as a target during learning with gradient descent. Instead we can simply nullify all but $k$ highest activation during the forward path through the network \cite{Kulkarni2015}.
+There are several ways to enforce a sparsity constrain.
+It is possible to perform gradient descent directly for fixed value of $\hat{\rho}$. In that case we would have to perform a second pass over the dataset to calculate the actual value of $\rho$ to be used as a target during learning with gradient descent. Instead we can simply nullify all but the $k$ highest activation during the forward pass through the network \cite{Kulkarni2015}.
 Or apply negative log-likelihood to the hidden layer of the network \cite{Zhao2015}.
-At last, to achieve true zero values on the hidden layer we can use absolute value penalty $l_{sparse}=\sum_{i=1}^N |h_i|$ in conjunction with rectifier linear unit activation function \cite{Glorot2011}.
+At last, to achieve true zero values on the hidden layer we can use an absolute value penalty $l_{sparse}=\sum_{i=1}^N |h_i|$ in conjunction with rectifier a linear unit activation function \cite{Glorot2011}.
 
-Sparse coding of the data has proven to be useful to solve classification problem.
-In particular, for classification task requires us to assign one of $C$ exclusive classes we can train an autoencoder with $C$ hidden units. Once training converges we expect that features, learned by the hidden layer would somewhat correspond to classes of tasks. We can then use encoder part of the network as initialization of a classifier of the same architecture \cite{Masci2011}.
+Sparse coding of the data has proven to be useful to solve the classification problem.
+In particular, the classification task requires us to assign one of $C$ exclusive classes we can train an autoencoder with $C$ hidden units. Once training converges we expect that features, learned by the hidden layer would somewhat correspond to classes of tasks. We can then use the encoder part of the network as initialization of a classifier of the same architecture \cite{Masci2011}.
 Such initialization leads to consistently better generalization results after supervised training of the classifier.
 
 \subsubsection{Variational Autoencoders}\label{ch:vae}
