@@ -1,6 +1,6 @@
 % !TEX root = ./thesis.tex
 
-\chapter{Technical details}
+\chapter{Technical background}
 \label{ch:tede}
 
 This chapter provides technical details relevant to the method proposed in chapter \ref{ch:mode}.
@@ -12,7 +12,7 @@ Subsection \ref{ch:ae} describes several unsupervised learning techniques for ar
 An artificial neural network is a mathematical model inspired by biological brain structure.
 A neural network comprises of a set of interacting computational units, called neurons.
 In practice, neurons' computation contains a linear transformation of inputs followed by an activation function.
-Sigmoid, ReLU and identity functions are among most commonly used activation function.
+Sigmoid, ReLU and identity functions are among most commonly used activation functions.
 
 Neural networks are organized in layers.
 A layer can be viewed as a set of neurons that rely on same inputs and have similar behavior i.e. activation function, output size, regularization parameters.
@@ -20,7 +20,7 @@ We also distinguish auxiliary layers that perform some transformation of the inp
 Scaling layer, applying nonlinearity function and pooling layer are one of many examples of such layers.
 
 Major neural networks groups are distinguished between each other by structure of connections between neurons.
-Feedforward neural networks prohibit cyclic connection and loops in network structure, while Recurrent neural networks have no such restriction.
+Feedforward neural networks prohibit cyclic connection and loops in the network structure, while Recurrent neural networks have no such restriction.
 
 In subsection \ref{ch:ffnn} we are going to describe basic building blocks of feedforward neural networks.
 Subsection \ref{ch:cnn} describes a special case of feedforward neural network with parameter sharing.
@@ -41,7 +41,7 @@ where $W$ is a column vector of perceptron parameters and $f$ is an activation f
 
 By combining several perceptrons in one set we can produce multiple output values of $y$.
 For simplicity, we will stack parameters of $j$ distinct perceptrons that use the same input of size $i$ into matrices $W$ and $b$, where $W$ is rectangular matrix of size $[i,j]$ and $b$ is a column vector of size $j$.
-In this case equation $\ref{eq:per}$ remains the same for column vector $y$ of size $j$. A set of perceptron-like neurons that perform computation on the same input forms a single \textit{fully connected} layer of multilayer neural network.
+In this case equation $\ref{eq:per}$ remains the same for column vector $y$ of size $j$. A set of perceptron-like neurons that perform computation on the same input forms a single \textit{fully connected} layer of a multilayer neural network.
 
 When we combine several layers together we would refer to input vector $x$ as \textit{input layer} and to the last layer of the network producing final output $y$ as \textit{output layer}. All intermediate layers between input and output are called \textit{hidden layers}. We would refer to the depth of the network as to number of computational units on the longest path connecting input and output layers.
 
@@ -119,8 +119,8 @@ We can use convolutional and pooling operations in \texttt{strided} mode. When u
 \end{equation*}
 
 Downsampling is essential to reduce computational complexity of the network.
-Downsampling with pooling layers improves positional tolerance of convolutional networks.
-Strided pooling is preferred to strided convolution operation for downsampling. Strided pooling layers are shown to work better in practice, allegedly, due to greater amount of valuable information preserved after downsampling.
+Downsampling with pooling layers improves positional tolerance of convolutional networks \cite{Scherer2010}.
+Strided pooling is preferred to strided convolution operation for downsampling. Strided pooling layers are shown to work better in practice, allegedly, due to greater amount of valuable information preserved during downsampling.
 
 Max-pooling operation does not rely on any internal parameters. During training, the position of the maximum element has to be stored. During backpropagation gradients are applied only to the position of the maximum value. Non-maximum elements of the input feature map do not contribute to the total error since they are not used by the upper layers of the network.
 
@@ -141,7 +141,7 @@ Problem \ref{eq:optnn} has no closed-form solution and finding optimal set of pa
 In practice, gradient descent methods are used to find good parametrization $\hat{\theta}$ of the neural network.
 
 Gradient descent methods suggests to iteratively update parameters $\theta_t$ each time taking a step $\eta$ towards the direction of a better solution $\theta_{t+1}=\theta_t - \eta \nabla_\theta \theta$ \cite{Cauchy1847}.
-We use vector partial derivatives $\nabla_\theta J(\theta)=\{ \frac{\partial J(\theta)}{\partial w_1}, \ldots, \frac{\partial J(\theta)}{\partial w_N} \}$ of function $J(\theta)$ at point $\theta_t$ as the the direction towards a better solution. Gradient descent method requires both functions $L(y, \hat{y})$ and $f(x, \theta)$ to be differentiable. Note, that differentiability of function $f(x, \theta)$ in $\theta$ implies differentiability of the activation function \ref{eq:per}. Algorithm pseudocode is shown on listing \ref{alg:bp}.
+We use vector of partial derivatives $\nabla_\theta J(\theta)=\{ \frac{\partial J(\theta)}{\partial w_1}, \ldots, \frac{\partial J(\theta)}{\partial w_N} \}$ of function $J(\theta)$ at point $\theta_t$ as the the direction towards a better solution. Gradient descent method requires both functions $L(y, \hat{y})$ and $f(x, \theta)$ to be differentiable. Note, that differentiability of function $f(x, \theta)$ in $\theta$ implies differentiability of the activation function \ref{eq:per}. Algorithm pseudocode is shown on listing \ref{alg:bp}.
 
 \input{auxilary/backprop}
 
@@ -157,7 +157,7 @@ These cases are shown on figure \ref{fig:critical}.
 \end{figure}
 
 In practice, solutions produced by gradient based methods have proven to have satisfying qualities \cite{Szegedy2016,He2015}.
-This might be due to the properties of high-dimensional non-convex error surfaces. The study by Y.Dauphin et al. \cite{Dauphin14} concludes, that saddle points and local minima on such surfaces are very likely to be close to global minima.
+This might be due to the properties of high-dimensional non-convex error surfaces. The study by Y.Dauphin et al. \cite{Dauphin14} concludes, that saddle points and local minima on such surfaces are very likely to be a good approximation of the global minima.
 
 \subsubsection{Stochastic gradient descent with mini-batches}
 
@@ -180,8 +180,8 @@ Subset of inputs selected this way are called \textbf{mini-batches}. Updated alg
 
 \subsubsection{Adam update rule}
 
-Training time of gradient descent based algorithm can be reduced by applying adaptive learning rates \cite{Kingma2015}.
-\textit{Adam update rule} or simply Adam is one of the algorithms that allow to reduce training time of gradient descent.
+Training time of gradient descent based algorithms can be reduced by applying adaptive learning rates \cite{Kingma2015}.
+\textit{Adam update rule} or simply \textit{Adam} is one of the algorithms that allows to reduce training time of the gradient descent.
 
 The Adam update rule maintains exponential moving average of the gradients $m_t$ and the squared gradient $v_t$.
 Hyperparameters $\beta_1, \beta_2$ set the exponential decay rates for both sets of variables.
@@ -211,7 +211,7 @@ To accelerate the learning process during first iterations of algorithm \ref{alg
 \end{equation*}
 where $t$ is a variable tracking current iteration number.
 
-The algorithm requires memory overhead proportional to the number of parameters $||\theta||$. Listing \ref{alg:adam} shows the full algorithm of Adam update rule written in pseudocode.
+The algorithm requires memory overhead proportional to the number of parameters $|\theta|$. Listing \ref{alg:adam} shows the full algorithm of Adam update rule written in pseudocode.
 
 \input{auxilary/adam}
 
@@ -222,7 +222,7 @@ The algorithm requires memory overhead proportional to the number of parameters 
 
 Applying an ensemble of models guarantees to perform not worse than any of ensemble members but the computational complexity of the training and evaluation grows linearly with the size of the ensemble. This might play a limiting factor on the size of the ensemble, especially when training of even a single model is computationally expensive.
 
-The \textit{dropout} technique allows to approximately achieve ensemble performance at relatively low computational overhead \cite{Srivastava2014}.
+The \textit{dropout} technique allows to approximately achieve performance of an ensemble of heterogenious models while only marginaly increasing training complexity \cite{Srivastava2014}.
 The dropout authors propose to ignore a randomly chosen subset of non-output neurons during training. A new subset of units is selected for each mini-batch or even for each training example.
 
 Training a model with dropout resembles training an ensemble of models. The models automatically follow the same layer structure and share neuron parameters. The number of possible models indirectly trained with dropout is roughly exponential in the number of non-output units $2^{||N||}$. Dropout prohibits only model graphs with broken connection between input and output units. Of course, these models are not trained explicitly and only a small subset is used during the training process. For training with dropout we can update optimization problem \ref{eq:optnn} as follows:
@@ -230,12 +230,12 @@ Training a model with dropout resembles training an ensemble of models. The mode
 \begin{equation}\label{eq:optnndo}
   \hat{\theta} = \argmin_{\theta \in \Bbb{R}^D} \E_\mu J(\theta, \mu) = \argmin_{\theta \in \Bbb{R}^D} \E_\mu \frac{1}{N} \sum_{i=1}^{N} L(y_i, f(x_i, \theta, \mu))
 \end{equation}
-where $\mu$ is a random mask.
+where $\mu$ is a random mask with $\{1, 0\}$ mask values for each non-output neuron. We have to provide \textit{keep probability} value $p_{keep} \in (0, 1]$. Keep probability specifies how likely each neuron to participate in every single training step. In terms of mask $\mu$ $p_{keep}=p(\mu_i = 1)$.
 
 This way during the training process we minimize the value of $\E_\mu J(\theta, \mu)$ iteratively sampling masks $\mu$ and minimizing function $J(\theta, \mu)$ for this masks explicitly.
 
 To perform prediction with such a model we need to collect votes from an exponential number of ensemble members.
-In practice the following two methods are commonly used. First, alike during the training process, we can sample some constant number $N$ of masks $\mu$ and use majority vote on a small subset of functions $\{f(x, \theta, \mu_1), \ldots, f(x, \theta, \mu_N)\}$. Alternatively, it has been shown that simply multiplying the weight of the layers by \textit{keep probability} provides a good approximation of stochastic evaluation \cite{Srivastava2014}. Later method requires only a single forward pass through the complete network for each prediction.
+In practice the following two methods are commonly used. First, alike during the training process, we can sample some constant number $N$ of masks $\mu$ and use majority vote on a small subset of functions $\{f(x, \theta, \mu_1), \ldots, f(x, \theta, \mu_N)\}$. Alternatively, it has been shown that simply scaling the weight of the layers by \textit{keep probability} provides a good approximation of the stochastic evaluation \cite{Srivastava2014}. Later method requires only a single forward pass through the complete network for each prediction.
 
 At last, dropout becomes especially useful when it is hard to control the actual model complexity. Developing or even fine-tuning a new task specific neural network architecture is a demanding process. It becomes more common to reuse an existing network architecture as Inception or ResNet \cite{He2015, Szegedy2016}. Even though number of parameters in this networks can be overwhelming for a particular task, rigorous regularization with dropout might be sufficient to achieve satisfactory results.
 
@@ -253,16 +253,16 @@ This schematically depicted on figure \ref{fig:ae}.
 
 We are going to refer to encoder as a deterministic differentiable function $f(x, \theta_f)$ that for a given set of parameters $\theta_f$ maps input $x\in \Bbb{R}^d$ into representation $h \in \Bbb{R}^{d'}$.
 Likewise, the decoder is a deterministic differentiable function $g(h, \theta_g)$ depending on parameters $\theta_g$, that maps $h\in\Bbb{R}^{d'}$ into $y\in \Bbb{R}^d$. We will further avoid specifying parameters $\theta_f$ and $\theta_g$ for simplicity.
-Given a loss function $L$, for a dataset $X=\{x_0, ..., x_i\}$ we can define the learning objective as follows \cite{Good2016}:
+For a specific loss function $L$ and a dataset $X=\{x_0, ..., x_i\}$ we can define the learning objective as follows \cite{Good2016}:
 
 \begin{equation}\label{eq:ae}
 \min_{\theta_f, \theta_g}\sum\limits_{x_i \in X}{L(x_i, g(f(x))}
 \end{equation}
 
-Learning the identity mapping itself is not particularly useful.
+Learning to reconstruct the input information from input information is not particulaly useful by itself.
 Instead we are often interested in reusing only parts of the autoencoder.
 For example, parameters of the encoder $\theta_f$ can serve as a good initialization of a discriminative model \cite{Masci2011, Vincent2010, Zhao2015}.
-Such initialization results in minor yet coherent improvement of generalization properties of the model.
+Such initialization has shown to lead to minor yet coherent improvement of generalization properties of the model.
 Variational Autoencoders, on the other hand, reuse decoder as a generator of new training examples \cite{Kingma2013}.
 Extracted features $h$ can represent interpretable properties of the input and can be used to adjust this
 properties during generation process \cite{Kulkarni2015, Whitney2016}.
@@ -280,11 +280,11 @@ On the other hand, if the capacity is chosen too low it can hurt the learning pr
 For example, low capacity autoencoders are prone to \textit{mode collapse}, when model produces the same output regardless of the input data \cite{Radford2015}.
 
 One of the ways to address the problem of overly high capacity of components can be using stacked autoencoders.
-In this approach, instead of directly mapping $h=f(x)$ and $y=g(h)$ into desired lower-dimensional space multiple intermediate mappings can be used $h_i=f_i(h_{i-1})$ and $\hat{h}_i=g_{i+1}(h_{i+1})$.
+In this approach, instead of directly mapping $h=f(x)$ and $y=g(h)$ into desired lower-dimensional space multiple intermediate mappings can be used $h_i=f_i(h_{i-1})$ and $\hat{h}_i=g_{i+1}(\hat{h}_{i+1})$.
 Stacked autoencoder can be trained in layer-wise manner.
-In this case first the mappings $y=g_0(h_0)$ and $h_0=f_0(x)$ are trained.
-Then follows training of mappings $y_1=g_1(h_1)$ and $h_1=f_0(h_0)$ and so forth.
-The architecture of stacked autoencoder is shown on figure \ref{fig:sae}
+In this case first the mappings $h_1=f_1(x)$  and $y=g_1(h_1)$ are trained.
+Then follows training of mappings $h_2=f_1(h_1)$ and $h_1=g_2(h_2)$ and so forth.
+The architecture of stacked autoencoder is shown on figure \ref{fig:mlae}
 % \ref{fig}
 
 \input{auxilary/mlae}
@@ -308,7 +308,7 @@ In this subsection we discuss the means of increasing generalization properties 
 Learning high capacity models is prone to overfitting.
 One of the common ways to decrease overfitting and make model learn useful features without actually changing the model is learning on a larger training corpus.
 
-Denoising autoencoders \ref{Vincent2010} allow to increase variation in training data by adding random noise to images. We construct input examples by adding random noise to the dataset according to some parameter $alpha$: $\hat{x}=n(x, \alpha)$.
+Denoising autoencoders \cite{Vincent2010} allow to increase variation in training data by adding random noise to visual data. We construct input examples by adding random noise to the dataset according to some parameter $alpha$: $\hat{x}=n(x, \alpha)$.
 Denoising autoencoders are yet supposed to reconstruct  the original image $L(x, g(f(x)))$.
 This approach expects encoded representation to be stable and robust under condition of input corruption.
 It also expects that the denoising tasks would result in learning useful structure of the input distribution.
@@ -350,7 +350,7 @@ where $\cdot$ is a dot product.
 Using this equation we would like to find latent feature maps $f_{k,c}$.
 Since equation \ref{eq:de} is under-determined and allows multiple solutions.
 Therefore a regularization term $z^i_k$ is added to encourage sparsity of the solutions.
-With sparsity term we can express the cost function $C$ for input $y_i$:
+By adding a sparsity term we can express full cost function $C$ for input $y_i$ as follows:
 
 \begin{equation}\label{eq:dec}
     C(y_i) = \frac{\lambda}{2} \sum^{K_o}_{c=1} ||\sum^{K_1}_{k=1}{z^i_k \cdot f_{k,c} - y^i_{k,c}}||^2_2 + \sum^{K_1}_{k=1}{|z^i_k|^p}
@@ -362,17 +362,17 @@ Problem \ref{eq:dec} for simplicity can be decomposed into 2 sequential quadrati
 
 \subsubsection{Unpooling layers}
 
-Like with convolutional layers, applying pooling layers results in change of the shape of the feature map.
-In this subsection we describe a method that allows to effectively revert max-pooling layer preserving the relative spatial position of extracted features as on original image.
+Like with convolutional layers, applying pooling layers might results in change of the shape of the feature map.
+In this subsection we describe a method that allows to effectively revert max-pooling layer preserving the relative spatial position of the extracted features as on original image.
 
 In section \ref{ch:cnn} we described applying max pooling layer with some stride $k$.
 Applying these layers allows to reduce the size of the feature map up to $k^2$ times while preserving, arguably, most relevant information about the extracted features.
 Max-pooling is crucial to convolutional neural networks for achieving some position tolerance of the extracted features \cite{Jaderberg2015}.
 
-The inverse operation of max-pooling is not well defined, since the maximum value must be placed somewhere inside the original volume of size $k^2$. Naively, we can choose an index of a cell index inside projection volume and put maximum values uniformly into the cells with that index.
-This procedure is depicted on figure \ref{fig:pool}.
-However, this approach destroys relative positioning of unpooled features.
-In other words, pooling allows higher lever features to recognize a face by presence of a nose and a mouth within neighboring smaller regions, naive unpooling might place both these features into the same region on the image.
+The inverse operation of max-pooling is not well defined, since the maximum value must be placed somewhere inside the original volume of size $k^2$. Naively, we can \textit{upsample} the features by simply putting maximum values into a fixed position within each upsample volume $k \times k$.
+Upsampling procedure is depicted on figure \ref{fig:pool}.
+However, this approach destroys relative positioning of the features.
+In other words, network might try to reconstruct 'nose' and 'eye' features in exactly the same region instead of placing them next to each other.
 
 \begin{figure}[h!]
   \centering
@@ -381,7 +381,7 @@ In other words, pooling allows higher lever features to recognize a face by pres
   \label{fig:pool}
 \end{figure}
 
-To address this issue an unpooling layer is introduced. Instead of using information about only the maximum value of the feature in the region, unpooling layers also use information about positioning of the feature. This positional information is called a mask. To every pooled value $x_{i,j}$ corresponds a single mask, indicating the position of the value $x_{i,j}$ inside the pulled volume. We can descripe unpooling operation $up(X, M)$ as follows:
+To address this issue an unpooling layer is introduced. Instead of using information about only the maximum value of the feature in the region, unpooling layers also use information about positioning of the feature. This positional information is called a \textit{mask}. To every pooled value $x_{i,j}$ corresponds a single mask, indicating the position of the value $x_{i,j}$ inside the pulled volume. We can descripe unpooling operation $up(X, M)$ as follows:
 
 \begin{equation}\label{eq:unp}
   \begin{aligned}
@@ -411,8 +411,7 @@ It's worth noting, that mask information extracted by a modified pooling layer d
 
 \subsection{Extracting useful features with Autoencoders}\label{ch:mod_ae}
 
-The standalone objective \ref{eq:ae} of autoencoders is not particularly useful.
-In this section we are going to describe specific use-cases of applying autoencoders along with required modification of objective function.
+With the autoencoder paradigm we try to extract useful features from the input data. In this subsection we try to disambiguate the term \textit{useful} and, show how it can be achieved in context of several learning tasks.
 
 \subsubsection{Sparse Autoencoders}\label{ch:sae}
 
@@ -434,7 +433,7 @@ A sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the
 \end{equation}
 
 For example, let's take a look at the case for sigmoid activation function in the hidden layer.
-Sigmoid produces outputs in the interval $[0, 1]$. If we can guarantee an average activation on the hidden layer $\hat{\rho} \leq 0.1$ we can rely upon the fact that no more than $10\%$ of hidden neurons would have activation close to $1.0$.
+Sigmoid produces outputs in the interval $[0, 1]$. If we can enforce an average activation on the hidden layer $\hat{\rho} \leq 0.1$ we can rely upon the fact, that no more than $10\%$ of hidden neurons would have activation close to $1.0$.
 
 A sparse constrain allows to extract useful features even for relatively high number of hidden units. Specifically, a decoder must be able to reconstruct the original representation relying only on few high activation on the hidden layer.
 
