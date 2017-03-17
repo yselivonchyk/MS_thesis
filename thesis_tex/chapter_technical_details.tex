@@ -145,6 +145,9 @@ We use vector of partial derivatives $\nabla_\theta J(\theta)=\{ \frac{\partial 
 
 \input{auxilary/backprop}
 
+In feedforward neural networks, due to the structural constrain, we can calculate the gradient for layer $i$ given the gradient of layer $(i+1)$ i.e. $\nabla_i J(\theta_i|\nabla_{i+1})$. The recurent procedure of calculating the gradients from the output layer back to input layer is often called \textit{backpropagation}.
+
+
 Gradient based methods do not guarantee to find the optimal solution.
 Traing can stop in a local minima ($\theta \leq \theta + \eta \delta | \forall \delta \text{ s.t. } |\delta|^2 \leq \epsilon$) or a saddle point.
 These cases are shown on figure \ref{fig:critical}.
@@ -155,6 +158,7 @@ These cases are shown on figure \ref{fig:critical}.
   \caption{Critical points of a loss function $f(x)$, where $x \in \Bbb{R}^2$.}
   \label{fig:critical}
 \end{figure}
+
 
 In practice, solutions produced by gradient based methods have proven to have satisfying qualities \cite{Szegedy2016,He2015}.
 This might be due to the properties of high-dimensional non-convex error surfaces. The study by Y.Dauphin et al. \cite{Dauphin14} concludes, that saddle points and local minima on such surfaces are very likely to be a good approximation of the global minima.
