@@ -85,18 +85,63 @@ Xavier initializer suggest using normalized initialization, that depends on the 
 where $i\in\{0, \ldots, |W_j|\}$ is a index of a weight in layer $j$ and $n_j$ is a number of input units of the layer $j$.
 
 
-
 \section{Backbone architectures}
+
+In this section we provide overview of three network architectures that we consider useful for trajectory learning from visual data.
+
+All architectures follow multilayer autoencoder design.
+Regardless of the backbone, design the last layer of the encoder is a fully connected layer with small (typically smaller than 4) number of computational units. We would refer to the ouputs of this layer as to  \textit{input encoding}.
+Additional constrains applied to the encoding are described in section \ref{ss:mf}.
+
+Throughout this work we stick to \textit{mirrored} designed of the encoder and decoder.
+This approach allows to have balanced complexity of encoder and decoder subnetworks.
+
 \subsection{Fully connected autoencoder}
+
+Fully connected layer of neural networks is a set of computational units, each of which relies on the full set of input parameters of the layer and produces a single output.
+We use conputational units as described by \ref{eq:per} with sigmoid as an activation function.
+Fully connected layers of that form with $n_{i-1}$ inputs and $n_i$ outputs rely on $|W_i|=n_{i-1}*(n_i+1)$ parameters.
+
+Work by Jaderberg et al. \cite{Jaderberg2015} suggests, that a fully connected neural network with a single hidden layer might be sufficient to capture spacial information about the input.
+In this work, a fully connected \textit{localisation net} with a single hidden layer and small number of output units (up to 6) is used to produce transformation parameters for visual data input.
+We believe that this architecture represents the most trivial design and use it as a reference backbone model.
+
+Fully connected layers rely on huge number of parameters comparing to convolutional and deconvolutional layers. Number of parameters grows fast with increase in number of layers or number of output units. This grows of complexity of parameter space can easily lead to overfitting in form of identity learning.
+
+A typical design of an autoencoder network is described by table ?? and depicted on figure ??.
+
 \subsection{Convolutional autoencoder}
-\cite{Nair2010}
+
+Convolutional models are showing best results in various computer vision competitions in the recent years \cite{ILSVRC15, Zhou2016}.
+
+Convolutional layers of neural networks rely on relatively small number of parameters.
+Convolutional neurons typically share the parameters across a single feature map \ref{eq:conv}.
+
+
+
+ReLU \cite{Nair2010}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{backbone_1.png}
+  \caption{TensorFlow detailed graph representation of a single fully .}
+  \label{fig:tf_graph}
+\end{figure}
+
 \subsection{WhatWhere autoencoder}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{backbone_2.png}
+  \caption{TensorFlow detailed graph representation of a single.}
+  \label{fig:tf_graph}
+\end{figure}
 
 \section{Model pretraining}
 
 
 
-\section{Manifold learning}
+\section{Manifold learning}\label{ss:mf}
 \subsection{Predictive objective}
 \subsection{Denoising regularization}
 \subsection{Feature set regularization}
