@@ -90,23 +90,43 @@ where $i\in\{0, \ldots, |W_j|\}$ is a index of a weight in layer $j$ and $n_j$ i
 In this section we provide overview of three network architectures that we consider useful for trajectory learning from visual data.
 
 All architectures follow multilayer autoencoder design.
-Regardless of the backbone, design the last layer of the encoder is a fully connected layer with small (typically smaller than 4) number of computational units. We would refer to the ouputs of this layer as to  \textit{input encoding}.
+Regardless of the backbone, design the last layer of the encoder is a fully connected layer with small (typically smaller than 4) number of computational units.
+We would refer to the ouputs of this layer as to  \textit{input encoding}.
 Additional constrains applied to the encoding are described in section \ref{ss:mf}.
 
 Throughout this work we stick to \textit{mirrored} designed of the encoder and decoder.
 This approach allows to have balanced complexity of encoder and decoder subnetworks.
 
+Learning objective of an autoencoder is to reconstruct the original image.
+We use $L_2$ $norm$ as the reconstruction loss $L_{reco}$:
+
+\begin{equation}
+  L_{2} = \frac{1}{2} \sum_{i, j, c} (x_{i,j,c} - \hat{x}_{i,j,c})^2
+\end{equation}
+
+where $x, \hat{x}$ are original image and network output correspondigly.
+
+Input images are encoded in RGBD format. It means that each image pixel $x_{i,j} \in \Bbb{U}^4$ is a 4-dimensional vector.
+Each color channel of pixel vector $x_{i,j}$ is a descrete value between 0 and 255: $\Bbb{U} = \{0, 1, \ldots, 255 \}$.
+We follow a common practice and treat values descrete values of set $\Bbb{U}$ as continious values in range $[0.0, 255.0]$.
+
+We scale down input values to allow potential perfect reconstruction by the network.
+Scaling is necessary, since activation functions as logistics sigmoid or hyperbolic tangent are upper bounded by 1.0.
+
+
 \subsection{Fully connected autoencoder}
 
 Fully connected layer of neural networks is a set of computational units, each of which relies on the full set of input parameters of the layer and produces a single output.
-We use conputational units as described by \ref{eq:per} with sigmoid as an activation function.
-Fully connected layers of that form with $n_{i-1}$ inputs and $n_i$ outputs rely on $|W_i|=n_{i-1}*(n_i+1)$ parameters.
+We use conputational units as described by \ref{eq:per}. We use logistics sigmoid as an activation function.
+In this form each fully connected layers with $n_{i-1}$ inputs and $n_i$ outputs rely on $|W_i|=n_{i-1}*(n_i+1)$ parameters.
 
 Work by Jaderberg et al. \cite{Jaderberg2015} suggests, that a fully connected neural network with a single hidden layer might be sufficient to capture spacial information about the input.
 In this work, a fully connected \textit{localisation net} with a single hidden layer and small number of output units (up to 6) is used to produce transformation parameters for visual data input.
 We believe that this architecture represents the most trivial design and use it as a reference backbone model.
 
-Fully connected layers rely on huge number of parameters comparing to convolutional and deconvolutional layers. Number of parameters grows fast with increase in number of layers or number of output units. This grows of complexity of parameter space can easily lead to overfitting in form of identity learning.
+Fully connected layers rely on huge number of parameters comparing to convolutional and deconvolutional layers.
+Number of parameters grows fast with increase in number of layers or number of output units.
+This growth of complexity of parameter space can lead to overfitting in form of identity learning by the network.
 
 A typical design of an autoencoder network is described by table ?? and depicted on figure ??.
 
@@ -116,8 +136,6 @@ Convolutional models are showing best results in various computer vision competi
 
 Convolutional layers of neural networks rely on relatively small number of parameters.
 Convolutional neurons typically share the parameters across a single feature map \ref{eq:conv}.
-
-
 
 ReLU \cite{Nair2010}
 
@@ -129,6 +147,15 @@ ReLU \cite{Nair2010}
 \end{figure}
 
 \subsection{WhatWhere autoencoder}
+
+Architecture of What-Where autoencoders \cite{Zhao2015} propose using additional information flow between encode and decoder to improve quality of reconstruction.
+What-where autoencoders store the positions of maximum-elements during max-pooling operation to reuse it during reconstruction.
+Given positional information decoder no longer have to "guess" the relative position of pooled features during upsampling.
+
+What-where autoencoders in the encoder part use the same architecture as convolutional conterpart.
+In the decoder part of the network in addition to transposed convolution \ref{ch:tcnn} an updated upsampling operation is used. Updated upsampling operation called \textit{unpooling} is described in section \ref{ch:unp}.
+
+We consider What-Where autoencoders to be useful for interpretable feature learning, since positional information flow should simplify the process of learning good image reconstruction. This simplification can possibly lead of lesser impact of the noisy $L_{reco}$ error on the learning process.
 
 \begin{figure}[h!]
   \centering

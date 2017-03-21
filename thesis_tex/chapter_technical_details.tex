@@ -26,6 +26,7 @@ In subsection \ref{ch:ffnn} we are going to describe basic building blocks of fe
 Subsection \ref{ch:cnn} describes a special case of feedforward neural network with parameter sharing.
 Finally, in subsection \ref{ch:opt} we discuss basic concepts of training artificial neural networks.
 
+
 % \subsection{Artificial Neural Network}
 \subsection{Feedforward Neural Networks}
 \label{ch:ffnn}
@@ -335,7 +336,7 @@ This quality is desirable for learning a useful feature mapping since it allows 
 As described in section \ref{ch:cnn}, number of parameters of convolutional layer depends only on kernel size and depth of the feature map.
 The number of parameters required by pooling layers is relatively small if not zero and does not depend on the size of the input.
 
-\subsubsection{Deconvolutional layers and input reconstruction}
+\subsubsection{Deconvolutional layers and input reconstruction} \label{ch:tcnn}
 
 While convolutional layers are natural for feature extraction in the encoder, reconstruction of highly dimensional input requires a different technique.
 One approach is to use an inverse-like operation to convolution.
@@ -364,7 +365,7 @@ Constant $\lambda$ balances contributions of the regularization term to the cost
 
 Problem \ref{eq:dec} for simplicity can be decomposed into 2 sequential quadratic problems and solved using the stochastic gradient descent method seamlessly with backpropagation.
 
-\subsubsection{Unpooling layers}
+\subsubsection{Unpooling layers}\label{ch:unp}
 
 Like with convolutional layers, applying pooling layers might results in change of the shape of the feature map.
 In this subsection we describe a method that allows to effectively revert max-pooling layer preserving the relative spatial position of the extracted features as on original image.
