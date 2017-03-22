@@ -1,23 +1,13 @@
 % !TEX root = ./thesis.tex
 
 \chapter{Related work}
-\label{ch:rewo}
-Stacked conv AE \cite{Masci2011} introduce Convolutional Auto-Encoder for hierarchical feature extraction.
-They claim, that initializing CNN with convolutional layers of trained CAE consistently increases perfromance of a CNN.
-
-VAE. Tutorial on VAE \cite{Doersch2016}
-
+Deep Learning \cite{LeCun2015}
 Rationalizing Neural Prediction \cite{Lei2016}
-
 Spacio-temporal video \cite{Patraucean2016}
-Moment matching \cite{Li2015}
 Deep learning for visual understanding: A review \cite{Guo2016}
 
-\textit{recommended by tutors}
-NG Sparse AE  \cite{Ng2011} introduces notion of sparcity properly
-Learning Deep Architectures for AI \cite{Bengio2009}
 Stacked convolutional auto-encoders for hierarchical feature extraction \cite{Masci2011}
-
+Stacked What-Where Auto-encoders \cite{Zhao2015}
 Spatial Transformer Networks \cite{Jaderberg2015}
 
 Loop closure detection for visual SLAM systems using deep neural networks \cite{Gao2015}
@@ -27,27 +17,53 @@ Deep Convolutional Inverse Graphics Network \cite{Kulkarni2015}.
 Based on idea of VAE XXX build a network that extracts features related to spatial transformations of 3D objects.
 
 Understanding Visual Concepts with Continuation Learning \cite{Whitney2016}
-Authors propose a neural network archtecture for extracting a subset of highly interpretable features
-from image sequencies.
+Authors propose a neural network architecture for extracting a subset of highly interpretable features
+from image sequences.
 
 Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion \cite{Vincent2010}
 
 Loop closure:
 Loop Closure Detection for Visual SLAM Using PCANet Features.
 Unsupervised learning to detect loops using deep neural networks for visual SLAM system.
-VLAD-Based Loop Closure Detection For Monocular SLAM.
-\cite{Xia2016, Gao2015a, Huang2016}
-
+VLAD-Based Loop Closure Detection For Monocular SLAM \cite{Xia2016, Gao2015a, Huang2016}
 
 
 Autoencoders
 
-Stacked What-Where Auto-encoders \cite{Zhao2015}
-Auto-Encoding Variational Bayes \cite{Kingma2013}
 
-Deep Learning \cite{LeCun2015}
+One popular class of unsupervised learners is a group of energy-based models.
+Restricted Boltzmann machines and deep Boltzmann machines are among the most prominent members of that group \cite{Ackley1985, Salakhutdinov2009}.
+Restricted Boltzmann machine is an undirected graphical model based on a bipartite graph structure.
+They learn dependency between input distribution and latent distribution in form of intractable partition function.
+Such representation is typically hard to use in both learning and evaluation and usually relies on the computationally expensive Monte Carlo Markov chain method.
 
-Notion of sparcity
 
+Generative Moment Matching Networks (GMMNs) \cite{Li2015, Ren2016} propose using a additional generative network to create new input examples in the feature space of an autoencoder.
+GMMNs auxiliary network maps randomly generated noise into outputs, that resemble target data distribution. GMMNs' learning objective is to generate inputs with similar statistics as the training data.
+This approach allows to perform input generation by a single pass through the trained network, which is advantageous comparing to costly MCMC sampling.
+Method uses stochastic gradient descent for training. GMMNs author claim that this architecture learns latent manifold on which the data has high density and that generative process yields highly realistic images.
+Yet, this approach does not attempt to extract interpretable latent features.
 
-Localization issues
+Variational Autoencoders (VAE) use autoencoder approach with additional objective, that input distribution in the feature space must explicitly match some target distribution \cite{Kingma2013, Doersch2016}.
+Most commonly, an multi-variant isotropic Gaussian is selected as the target probability distribution.
+In case of successful learning, sampling from the target distribution should produce latent codes of some realistic inputs, which can be further projected back into input space using decoder network.
+This approach allows learning disentangled latent features of the data distribution in form of components of the target distribution space.
+
+Generative adversarial networks (GANs) \cite{Goodfellow2014} use alike approach of sampling data-points, close to original data distribution, by projecting random samples of explicitly defined latent feature space.
+Yet, instead of training the decoder (or generator, in that case) network on the original data directly, as autoencoders do, GANs use additional \textit{discriminator} network. Discriminator defines training objective for the generator. Discriminator network trains to distinguish artificial examples produced by the generator from samples of true data distribution.
+Generator, at the same time, learns to produce examples indistinguishable from the data distribution by trying to maximize discriminator's error on artificial inputs.
+This approach allows to reveal interesting latent representations of the data space that were not archived with other types of models.
+As a disadvantage, it proved to be hard to learn combined training objective of the ensemble of two networks.
+This complicates the training process.
+Furthermore, additional tweaks have to be used to enforce variation in the generator's outputs.
+Without it generator is prone to \textit{mode collapse}, when generated outputs are hardly distinguishable from each other regardless of the input values.
+
+Away from generative models a few techniques has been developed to extract useful features with autoencoders.
+Sparse autoencoders is one of the examples in context of classification task \cite{Ng2011, Makhzani2013, Masci2011}. Sparse autoencoders impose additional sparsity constrain on the encoding space.
+Such a constrain enforces encoder to have low average activation on the output layer, which highly resembles a neural network trained for classification.
+Autoencoder trained this way can be used for initialization of a classification network of a similar architecture.
+
+Deep convolution inverse graphics networks (DC-IGNs) make an attempt to extract interpretable features out of visual data \cite{Kulkarni2015}.
+DC-IGNs are trained to extract representation of the relevant features, such as spatial orientation of an object or position of a light source. Ideally, this should allow to manipulate values of the learned features for new inputs. This approach develops on the idea of VAEs by adding a second encoding space, not controlled by variational objective, for interpretable features. Network is trained on sequences, depicting relevant feature transformation i.e. changing orientation of a single object in horizontal plane. This process still requires labeled sequences of visual data for learning process. We find this model the most relevant for our tasks at hand: learning interpretable latent features from unlabeled visual data.
+
+The work on Understanding Visual Concepts with Continuation Learning \cite{Whitney2016} generalizes approach of DC-IGNs for image sequences. Their approach is based on the idea, that image $t+1$ in a sequence can be reconstructed with high quality by decoding latent representation of the image $t$, given some low-dimensional information about transformation between two images. To achieve that they train autoencoder using pairs of subsequent images. Autoencoder is supposed to reconstruct an image, given encoding of a previous image and some sparse vector, representing transformation. Transformation is extracted with additional \textit{gating} layer, that has access to information about both images.

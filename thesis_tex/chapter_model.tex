@@ -124,6 +124,8 @@ Work by Jaderberg et al. \cite{Jaderberg2015} suggests, that a fully connected n
 In this work, a fully connected \textit{localisation net} with a single hidden layer and small number of output units (up to 6) is used to produce transformation parameters for visual data input.
 We believe that this architecture represents the most trivial design and use it as a reference backbone model.
 
+Another group of authors succesfully aplied fully-connected autoencoder to learn latent input representation using Generateive Moment-Matching newtworks \cite{Li2015}. In their experiment, fully connected autoencoders were able to construct dense manifold of the input. For small datasets as MNIST and Toronto Faces Dataset \cite{tfd,lecun-mnisthandwrittendigit-2010} 2 or 3 layers in encoder and decoder networks were sufficient.
+
 Fully connected layers rely on huge number of parameters comparing to convolutional and deconvolutional layers.
 Number of parameters grows fast with increase in number of layers or number of output units.
 This growth of complexity of parameter space can lead to overfitting in form of identity learning by the network.
