@@ -1,0 +1,11 @@
+{
+  "projectPath": "/home/eugene/repo/MS_thesis",
+  "title": "LaTeX-Plus Project",
+  "root": "thesis_tex/chapter_related_work.tex",
+  "program": "pdflatex",
+  "latexmkOptions": "-bibtex -pdf -shell-escape",
+  "output": ".latex",
+  "openOutput": "true",
+  "postAction": "link",
+  "postPath": ""
+}
