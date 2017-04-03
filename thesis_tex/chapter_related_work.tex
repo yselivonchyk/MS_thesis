@@ -1,41 +1,29 @@
 % !TEX root = ./thesis.tex
 
 \chapter{Related work}
-Deep Learning \cite{LeCun2015}
-Rationalizing Neural Prediction \cite{Lei2016}
-Spacio-temporal video \cite{Patraucean2016}
-Deep learning for visual understanding: A review \cite{Guo2016}
 
-Stacked convolutional auto-encoders for hierarchical feature extraction \cite{Masci2011}
-Stacked What-Where Auto-encoders \cite{Zhao2015}
+Rationalizing Neural Prediction \cite{Lei2016}
+Deep learning for visual understanding: A review \cite{Guo2016}
 Spatial Transformer Networks \cite{Jaderberg2015}
 
 Loop closure detection for visual SLAM systems using deep neural networks \cite{Gao2015}
 Authors build a denoising autoencoder with sparse objective adding continuity objective.
 Continuity objective enforces L2 similarity between extracted features for consecutive frames. They use dataset: freiburg2 slam.
-Deep Convolutional Inverse Graphics Network \cite{Kulkarni2015}.
-Based on idea of VAE XXX build a network that extracts features related to spatial transformations of 3D objects.
-
-Understanding Visual Concepts with Continuation Learning \cite{Whitney2016}
-Authors propose a neural network architecture for extracting a subset of highly interpretable features
-from image sequences.
-
-Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion \cite{Vincent2010}
 
 Loop closure:
 Loop Closure Detection for Visual SLAM Using PCANet Features.
 Unsupervised learning to detect loops using deep neural networks for visual SLAM system.
 VLAD-Based Loop Closure Detection For Monocular SLAM \cite{Xia2016, Gao2015a, Huang2016}
 
+spatialy dependant tasks >>
 
-Autoencoders
-
+VizDoom stuff >>
 
 One popular class of unsupervised learners is a group of energy-based models.
-Restricted Boltzmann machines and deep Boltzmann machines are among the most prominent members of that group \cite{Ackley1985, Salakhutdinov2009}.
+Restricted Boltzmann machines and Deep Boltzmann machines are among the most prominent members of that group \cite{Ackley1985, Salakhutdinov2009}.
 Restricted Boltzmann machine is an undirected graphical model based on a bipartite graph structure.
 They learn dependency between input distribution and latent distribution in form of intractable partition function.
-Such representation is typically hard to use in both learning and evaluation and usually relies on the computationally expensive Monte Carlo Markov chain method.
+Such representation is typically hard to use in both learning and evaluation and usually relies on the computationally expensive Monte Carlo Markov Chain method.
 
 
 Generative Moment Matching Networks (GMMNs) \cite{Li2015, Ren2016} propose using a additional generative network to create new input examples in the feature space of an autoencoder.
@@ -43,6 +31,12 @@ GMMNs auxiliary network maps randomly generated noise into outputs, that resembl
 This approach allows to perform input generation by a single pass through the trained network, which is advantageous comparing to costly MCMC sampling.
 Method uses stochastic gradient descent for training. GMMNs author claim that this architecture learns latent manifold on which the data has high density and that generative process yields highly realistic images.
 Yet, this approach does not attempt to extract interpretable latent features.
+
+Autoencoders
+Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion \cite{Vincent2010}
+Stacked What-Where Auto-encoders \cite{Zhao2015}
+Stacked convolutional auto-encoders for hierarchical feature extraction \cite{Masci2011}
+
 
 Variational Autoencoders (VAE) use autoencoder approach with additional objective, that input distribution in the feature space must explicitly match some target distribution \cite{Kingma2013, Doersch2016}.
 Most commonly, an multi-variant isotropic Gaussian is selected as the target probability distribution.
