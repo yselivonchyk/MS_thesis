@@ -74,7 +74,7 @@ Another options might include layer-wise weight initialization, pre-training of 
 Yet, we would prefer the issue of weight initialization not to effect the training process.
 
 
-Xavier initializer suggest using normalized initialization, that depends on the number of inputs and ouputs of the layer \cite{Good2016}. Weight values are drown uniformly at random from a normal distribution $\Bbb{U}$:
+Xavier initializer suggest using normalized initialization, that depends on the number of inputs and outputs of the layer \cite{Good2016}. Weight values are drown uniformly at random from a normal distribution $\Bbb{U}$:
 
 \begin{equation}\label{eq:xavier}
   w_{j, i} \sim \Bbb{U}(
@@ -179,37 +179,95 @@ Yet, Xavier initialization does not guarantee, that a good local minima will be 
 Another robust approach to initialize network weights is reusing the weight of an already trained model.
 As, for example, we can initialize model with weights, that has been learned by the same model architecture but on a different dataset \cite{Yosinski2014}.
 
+We have next motivation for model pre-training.
 In our early experiments we discovered high instability of the training process.
 That is to say, an autoencoder based model learned to produce the same output image regardless of the input.
 We assume, that this single output was a solution for minimization of average MSE on the complete training set.
 
 We discovered that this instability can be explained by one of the next 2 factors:
 \begin{enumerate}
-  \item Extremely hight compression rates. Trying to represent 76800 dimensional inputs in a 6- or lower-dimensional space is highly non trivial. Decreasing the compression rate always resulted in a more stable training.
+  \item Extremely high compression rates. Trying to represent 76800 dimensional inputs in a 6- or lower-dimensional space is highly non trivial. Decreasing the compression rate always resulted in a more stable training.
   \item Noisy $L2$ loss. Neighboring pixels of a computer game images often have sharp differences and therefore are less correlated between each other.
-  While we are trying to discover special structure using pixel-wise $L2$ loss, such low correlation can be detrimental to the learning process.
-  Since neighboring pixels can look as different from target value as remote pixels of the image, a small errors of the spacial transformations of the data can result in as high error as a large spacial transformations. These impedes learning process.
+  While we are trying to discover special structure using pixel-wise means squared error (MSE), such low correlation can be detrimental to the learning process.
+  The reason is, that neighboring pixels can look as different from target value as remote pixels of the image.
+  Which means that a small errors in the spacial transformations of the data can result in as high error as a large spacial transformations.
+  These impedes learning process.
 \end{enumerate}
-% TODO: insert information about L2 error for neigbouring pixels
+% TODO: insert information about L2 error for neigboring pixels
 % Mathieu2015 - MSE issues
 
 From these two issues we can naturally deriver several methods for tackling this problem.
-First, we can increase dimensionality of the encoding space, thus decreasing the compression ratio of the data. Unfortunately, this would negatively effect the goal of this work: extracting low-dimensional interpretable features. Therefore, we propose to improve the learning process by mitigating the noisy nature of the mean squared error.
+First, we can increase dimensionality of the encoding space, thus decreasing the compression ratio of the data.
+Unfortunately, this would negatively effect the goal of this work: extracting low-dimensional interpretable features.
+Therefore, we propose to improve the learning process by mitigating the noisy nature of the mean squared error.
 
 We propose a model pre-training procedure that would incentivize learning of spatial information by the feature extractor (encoder).
 We suggest, that increasing correlation of the neighboring pixels would result in at least local differentiability of spacial-dependent components of the latent feature space.
 This quality should positively impact probability of learning latent representation of, specifically, spacial features by gradient descent.
 
-In particular, we propose using training data to generate inputs for pre-training with higher local correlation between pixels. We suggest using gaussian blur as a preprocessing step to produce such data.
+In particular, we propose using training data to generate inputs for pre-training with higher local correlation between pixels.
+We suggest using Gaussian blur as a preprocessing step to produce such data.
+Next formula describes the transformation for each pixel of the image:
 
+\begin{equation}
+  G(x, y, \sigma) = \frac{1}{2\pi\sigma^2}\exp^{-\frac{x^2+y^2}{2\sigma^2}}
+\end{equation}
+where $(x, y)$ is relative position of the effected pixel to the source of transformation, $\sigma$ is real-valued parameter of the transformation.
 
+Our pre-training technique is therefore dependent on two parameters: blur $\sigma$ and number of pre-training steps $N$.
+We perform pre-training in scheduled way, by decreasing $\sigma$ linearly during the pre-training phase.
+This allows smooth adaptation of the model parameters to the actual training data.
+Altogether, we summarize our algorithm on listing \ref{alg:pretr}.
+
+\input{auxilary/pretraining}
 % TODO: finish the thought, add some math
 
 \section{Manifold learning}\label{ss:mf}
 
-Manifold, learned by a neural network does not immediately provide interpretable information.
-
+While Variational Autoencoders and Generative moment matching networks can successfully learn dense data manifold, those models make no assumption about the nature of the manifold space \cite{Li2015, Ren2016, Kingma2013}.
+In this section we describe our regularization techniques to incentivize manifold construction in more interpretable form.
+For instance, we would like the manifold space to have local resemblance of the Euclidean space.
+Also, we prefer to have predictable density of the data in the manifold space.
 
 \subsection{Predictive objective}
+
+With predictive objective we would like to explore the temporal relation of the data.
+Training data is represented as one or multiple sequences of images.
+Each sequence contains information about some unspecified arbitrary movement of an actor (player) through the environment (game).
+This type of data contains at least two structural dependencies: correlation of information within each single image and temporal dependencies between frames.
+While structural dependency within a single image is observed by the model at once for each input image, temporal relation of the data is not taken into account.
+With predictive objective we would like to create additional constrain on the model, that would allow learning of that temporal dependence of the data.
+
+Let's first try to describe minimum necessary number of degrees of freedom.
+Let's assume that the environment (a game map, or a building) is fixed, has no moving objects and does not change over time.
+In that case we can construct the first person view of player given next inputs:
+\begin{enumerate}
+  \item $x, y, z$ - axes coordinates of the player within the environment,
+  \item $\phi, \theta, \psi$ -  - roll, pitch, yaw angles depending on the orientation of player's view to coordinate axis,
+  \item $\alpha$ - angle of players view.
+\end{enumerate}
+
+We can safely assume, that angle $\alpha$, as well as other possible output specific parameters, remains constant over the time.
+In that case, we have in total 6 variables.
+Namely, vectors of actor's view and position.
+Lets assemble them into a players parameter vecotr $p=(x, y, z, \phi, \theta, \psi)$.
+
+Lets make next two assumptions:
+\begin{enumerate}
+  \item Variables $x, y, z, \phi, \theta, \psi$ are independent from each other in general case.
+  \item Function, $p_t=f(t)$, extracting player's positional information over time $t$, is continuous.
+\end{enumerate}
+
+
+\ref{fig:m_pred}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.85\textwidth,height=0.85\textheight, keepaspectratio]{prediction}
+  \caption{.}
+  \label{fig:m_pred}
+\end{figure}
+
+
 \subsection{Denoising regularization}
 \subsection{Feature set regularization}
