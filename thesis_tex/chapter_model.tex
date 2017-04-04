@@ -219,7 +219,7 @@ We perform pre-training in scheduled way, by decreasing $\sigma$ linearly during
 This allows smooth adaptation of the model parameters to the actual training data.
 Altogether, we summarize our algorithm on listing \ref{alg:pretr}.
 
-\input{auxilary/pretraining}
+% \input{auxilary/pretraining}
 % TODO: finish the thought, add some math
 
 \section{Manifold learning}\label{ss:mf}
@@ -235,7 +235,7 @@ With predictive objective we would like to explore the temporal relation of the 
 Training data is represented as one or multiple sequences of images.
 Each sequence contains information about some unspecified arbitrary movement of an actor (player) through the environment (game).
 This type of data contains at least two structural dependencies: correlation of information within each single image and temporal dependencies between frames.
-While structural dependency within a single image is observed by the model at once for each input image, temporal relation of the data is not taken into account.
+While structural dependency within a single image is observed by the model at once for each input, temporal relation of the data is not taken into account.
 With predictive objective we would like to create additional constrain on the model, that would allow learning of that temporal dependence of the data.
 
 Let's first try to describe minimum necessary number of degrees of freedom.
@@ -250,24 +250,56 @@ In that case we can construct the first person view of player given next inputs:
 We can safely assume, that angle $\alpha$, as well as other possible output specific parameters, remains constant over the time.
 In that case, we have in total 6 variables.
 Namely, vectors of actor's view and position.
-Lets assemble them into a players parameter vecotr $p=(x, y, z, \phi, \theta, \psi)$.
+Lets assemble them into a players parameter vector $p=(x, y, z, \phi, \theta, \psi)$.
 
 Lets make next two assumptions:
 \begin{enumerate}
   \item Variables $x, y, z, \phi, \theta, \psi$ are independent from each other in general case.
-  \item Function, $p_t=f(t)$, extracting player's positional information over time $t$, is continuous.
+  \item Function, $p_t=f(t)$, extracting player's positional information over time $t$, is a continuous function.
 \end{enumerate}
 
+Let's assume, that encoder part of the network $e(x_t)= \hat{p_t}$, where $x_t$ is an image input at time $t$, successfully reconstructs the trajectory ${x_0, \ldots, x_N}$ on some manifold $M$.
+Than we can state, that a local neighborhood of each point on the manifold $\hat{p_t}$ resembles continuous space of vector $p$. That gives us a possibility to apply geometrical operations within a neighborhood.
 
-\ref{fig:m_pred}
+To add predictive objective we shall rely on the fact, that image at time $t_i$ is statistically dependent on whole sequence of previous images ${t_0, \ldots, t_{i-1}}$.
+Given information ${t_0, \ldots, t_{i-1}}$ we can try to predict information about at time $i$.
+While in the space of input images this task not trivial, in the space of player parameters $p$ we can simply approximate next position $p_{t+1}$ by current direction.
+In other words, we can expect, that next transition of the player during small time period $\epsilon$ would be a lot like previous transition over the same period of time.
+If we express it as $p_i = p_{i-1} + \delta_{i-1}$ we can expect that $\delta_i \approx \delta_{i-1}$ for sufficiently small time step. Deriving from that, we can construct next prediction procedure:
+\begin{equation}
+  \begin{aligned}
+    &p_{i+1} = p_i + \delta_i \approx p_i + \delta_{i-1},\\
+    &p_i + \delta_{i-1} = p_i + (p_i - p_{i-1}) = 2*p_i - p_{i-1}, \\
+    &p_{i+1} \approx 2*p_i - p_{i-1}
+  \end{aligned}
+\end{equation}
+
+At the same time, for sufficiently small values of $\delta$ we can expect this approximation to hold in the manifold space:
+\begin{equation}
+  \hat{p}_{i+1} \approx 2*\hat{p}_i - \hat{p}_{i-1}
+\end{equation}
+
+This procedure is schematically depicted on figure \ref{fig:m_pred}.
+
+Unfortunately, the discretization of the video stream of the training data does not guarantee sufficiently small transitions between consecutive frames.
+This is especially true for changes of the angle of view ($\phi, \theta, \psi$), since they can appear almost instantaneously.
 
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.85\textwidth,height=0.85\textheight, keepaspectratio]{prediction}
-  \caption{.}
+  \caption{Approximating encoding of frame $x_3$ by the encodings of two previous frames $x1, x2$} on the manifold trajectory.
   \label{fig:m_pred}
 \end{figure}
 
+% TODO: add a couple of words about model changes and reconstruction error
 
 \subsection{Denoising regularization}
-\subsection{Feature set regularization}
+
+Early experiments showed largely uneven density of the manifold projection.
+In particular cases this lead to "lumps" of similar images concentrated in small region of the projection space.
+It appeared, that differences between the images within the lump and a rather similar reconstruction effected the training error only slightly comparing to more contrastive sequences.
+Which resulted in low gradient values comparable to noisy effect of more contrastive data. 
+
+\subsection{Density regularization}
+
+Low density regions
