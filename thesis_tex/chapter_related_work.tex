@@ -26,17 +26,19 @@ They learn dependency between input distribution and latent distribution in form
 Such representation is typically hard to use in both learning and evaluation and usually relies on the computationally expensive Monte Carlo Markov Chain method.
 
 
+A large body of research is dedicated to Autoencoder based models.
+Autoencoder is an artificial neural network allowing to compress unlabeled data into a lower dimensional space.
+Autoencoders learn by simultaneously projecting data into a more compact representation (encoding) and reconstructing original input from the compressed form (decoding).
+Several autoencoder models has lead to advances in computer vision.
+Stacked convolutional autoencoders allow to archive better results on image classification task \cite{Masci2011}. Stacked denoising autoencoders showed still better results by learning from randomly changed data  \cite{Vincent2010}.
+Stacked What-Where Auto-encoders allowed to apply models of the kind to broader range of training datasets \cite{Zhao2015}.
+Yet, one the most fascinating results in resent years has been achieved by generative models based on autoencoder paradigm.
+
 Generative Moment Matching Networks (GMMNs) \cite{Li2015, Ren2016} propose using a additional generative network to create new input examples in the feature space of an autoencoder.
 GMMNs auxiliary network maps randomly generated noise into outputs, that resemble target data distribution. GMMNs' learning objective is to generate inputs with similar statistics as the training data.
 This approach allows to perform input generation by a single pass through the trained network, which is advantageous comparing to costly MCMC sampling.
 Method uses stochastic gradient descent for training. GMMNs author claim that this architecture learns latent manifold on which the data has high density and that generative process yields highly realistic images.
 Yet, this approach does not attempt to extract interpretable latent features.
-
-Autoencoders
-Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion \cite{Vincent2010}
-Stacked What-Where Auto-encoders \cite{Zhao2015}
-Stacked convolutional auto-encoders for hierarchical feature extraction \cite{Masci2011}
-
 
 Variational Autoencoders (VAE) use autoencoder approach with additional objective, that input distribution in the feature space must explicitly match some target distribution \cite{Kingma2013, Doersch2016}.
 Most commonly, an multi-variant isotropic Gaussian is selected as the target probability distribution.
