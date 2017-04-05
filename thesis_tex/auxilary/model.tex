@@ -1,0 +1,140 @@
+% !TEX root = ../thesis.tex
+
+\begin{figure}
+
+\centering
+\begin{tikzpicture}
+%   [align=center,node distance=2cm]
+  [
+    every label/.style={align=center},
+  	lbl/.style={draw, circle, minimum width=0mm, minimum height=0mm, inner sep=0pt},
+    vlbl/.style={draw, circle, minimum width=0mm, minimum height=0mm, inner sep=0pt},
+    state/.style={draw, circle, minimum width=6mm, minimum height=6mm, inner sep=3pt},
+    param/.style={draw, rectangle, minimum width=6mm, minimum height=6mm, inner sep=3pt},
+    func/.style={draw, rectangle, minimum width=2.9cm, minimum height=1cm, inner sep=3pt, rounded corners},
+    relu/.style={draw, rectangle, minimum width=1cm, minimum height=1cm, inner sep=3pt, rounded corners},
+    enc/.style={draw, trapezium, shape border rotate=-180, minimum width=0.7cm, minimum height=0.7cm, inner sep=2pt},
+    dec/.style={draw, trapezium, shape border rotate=90,  minimum width=0.7cm, minimum height=0.7cm, inner sep=2pt},
+    loss/.style={draw, diamond, minimum width=1cm, minimum height=1cm, inner sep=2pt},
+    node distance=20mm,
+    classical/.style={dashed,->,shorten >=4pt,shorten <=4pt,>=stealth},
+    % Define arrow style
+    pil/.style={
+           ->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+%     dotted/.style={dotted,-,shorten >=4pt,shorten <=4pt,>=stealth}
+  ]
+%   \node (x) [state, label=left:$X_1$] {$x_1$};
+  \node (x1) [state, label=left:$X_1$] {$x_1$};
+  \node (x2) [state, below of=x1,label=left:$X_2$] {$x_2$};
+  \node (enc1) [enc, right=.5cm of x1] {$E$};
+  \node (enc2) [enc, right=.5cm of x2] {$E$};
+  \node (e1) [state, right of=enc1,shift={(-0.5,0)}] {$e_1$};
+  \node (e2) [state, right of=enc2,shift={(-0.5,0)}] {$e_2$};
+
+%   prediction
+  \node (pred) [func, right=1.0cm of e2,label=below:Prediction] {$(2*e_2-e_1)$};
+  \node (e3) [state, right=.5cm of pred,label=below:prediction] {$e_3^*$};
+
+%   noise
+  \node (noise) [func, below right=1.2cm and 1.13cm of e2, label=below:Inject noise] {$e_2 + \epsilon*N^d(0, 1)$};
+  \node (n2) [state, right=.5cm of noise,label=below:noisy] {$n_2$};
+  \node (eps) [param, left=1.cm of noise] {$\epsilon$};
+
+%   distance
+  \node (dist) [func, below=1cm of noise,label=below:Distance] { $\text{  }|e_1, e_2|_2^2-d_{max}\text{  }$ };
+%   \node (d) [state, right=.5cm of dist,label=below:distance] {$\delta d$};
+  \node (rel) [relu, right=0.5cm of dist,label=below:ReLU] {$max(0,\delta d )$};
+  \node (dmin) [param, left=1.cm of dist] {$d_{m}$};
+
+%   decoding
+  \node (decp) [dec, right=.5cm of e3] {$D$};
+  \node (dec2) [dec, above of=decp] {$D$};
+  \node (decn) [dec, right=.5cm of n2] {$D$};
+
+  \node(l2)[loss, right=.5cm of dec2, label={[xshift=0.8cm]below:{Autoencoder objective}}]{$L_{x1}$};
+  \node(lp)[loss, right=.5cm of decp, label={[xshift=0.9cm]below:{Predictive regularization}}]{$L_{x3}$};
+  \node(ln)[loss, right=.5cm of decn, label={[xshift=0.9cm]below:{Denoising regularization}}]{$L_{x2}$};
+  \node(ld)[loss, below of=ln, label={[xshift=0.9cm]below:{Density regularization}}]{$L2$};
+
+
+%   \node (le3) [state, right of=lp] {$x_3$};
+%   \node (le2_1) [state, right of=l2] {$x_2$};
+%   \node (le2_2) [state, right of=ln] {$x_2$};
+
+  \node (a) [param, right=.9cm of lp] {$\alpha$};
+  \node (b) [param, right=.9cm of ln] {$\beta$};
+  \node (g) [param, right=.9cm of ld] {$\gamma$};
+
+%   labels
+  \node (lbl2) [lbl, above of=enc1, yshift=-1cm, label=above:\large{Encoder}]{};
+%   \node (lbl3) [lbl, left of=lbl2,label=above:\large{Inputs}]{};
+  \node (lbl5) [lbl, above of=l2, yshift=-1cm, label=above:\large{Losses}]{};
+  \node (lbl4) [lbl, above of=dec2, yshift=-1cm, xshift=-0.3cm, label=above:\large{Decoder}]{};
+  \node (lblx) [lbl, left of=lbl4]{};
+  \node (lbl1) [lbl,left of=lblx, xshift=0.7cm,label=above:\large{Calculations}]{};
+%   \node (lbl6) [lbl, right of=lbl5, label=above:\large{Parameters}]{};
+
+%   \node (vlbl_p) [vlbl, right of=a, label={[xshift=.5cm]left:\rotatebox{-90}{\large{Predictive}}}]{};
+%   \node (vlbl_ae) [vlbl, above of=vlbl_p, label={[xshift=-.5cm]left:\rotatebox{-90}{\large{Autoencoder}}}]{};
+%   \node (vlbl_n) [vlbl, below of=vlbl_p,label={[xshift=-0.5cm, align=center]left:{\rotatebox{-90}{\large{Denoising}}}}]{};
+%   \node (vlbl_d) [vlbl, below of=vlbl_n, label={[xshift=.5cm]left:\rotatebox{-90}{\large{Density}}}]{};
+
+
+%   arrows
+%   \draw[->] (description) .. controls ([xshift=-4cm] description) and ([xshift=4cm] text) .. (text);
+  \draw[->] (e2) .. controls ([xshift=1cm, yshift=-2cm] e2) and ([xshift=-.5cm] dist.north west) .. (dist);
+  \draw[->] (e2) .. controls ([xshift=1cm, yshift=-1cm] e2) and ([xshift=-1cm] noise.north west) .. (noise);
+
+  \draw[->] (e1) .. controls ([xshift=1cm] e1.east) and ([xshift=-.5cm] pred.north west) .. (pred);
+  \draw[->] (e1) .. controls ([xshift=-1cm, yshift=-2cm] e1) and ([xshift=-2.0cm] dist.west) .. (dist);
+
+
+  \draw[->] (x2) -- (enc2);
+  \draw[->] (enc2) -- (e2);
+  \draw[->] (e2) -- (pred);
+  \draw[->] (pred) -- (e3);
+  \draw[->] (e3) -- (decp);
+  \draw[->] (decp) -- (lp);
+%   \draw[->] (le3) -- (lp);
+	\draw[->] (a) -- (lp);
+
+  \draw[->] (x1) -- (enc1);
+  \draw[->] (enc1) -- (e1);
+  \draw[->] (e1) -- (dec2);
+  \draw[->] (dec2) -- (l2);
+%   \draw[->] (le2_1) -- (l2);
+	\draw[->] (b) -- (ln);
+
+%   \draw[->] (dist) -- (d);
+%   \draw[->] (d) -- (rel);
+  \draw[->] (dist) -- (rel);
+  \draw[->] (rel) -- (ld);
+
+  \draw[->] (noise) -- (n2);
+  \draw[->] (n2) -- (decn);
+  \draw[->] (decn) -- (ln);
+%   \draw[->] (le2_2) -- (ln);
+  \draw[->] (g) -- (ld);
+
+  \draw[->] (eps) -- (noise);
+  \draw[->] (dmin) .. controls ([xshift=-.2cm] dist.south west) .. (dist);
+
+
+
+%   	\draw [color=gray,thick](-1.5,-1) rectangle (15.5,1.5);
+% 	\node at (-0.5,1) [above=5mm, right=0mm] {\textsc{first-order noise shaper}};
+% 	\draw [color=gray,thick](-0.5,-9) rectangle (12.5,-5);
+% 	\node at (-0.5,-9) [below=5mm, right=0mm] {\textsc{second-order noise shaper}};
+
+%   \coordinate (aux) at (x1.south) -- (x1.south|-x2.north);
+%   \draw[dashed]([xshift=-1cm]x1.north west|-aux) -- ([xshift=1cm]x2.north east|-aux);
+
+
+%   \draw (0,-1) -- (4,-1);
+\end{tikzpicture}
+\caption{Spacial feature extractor with regularization terms.}
+\label{fig:model}
+\end{figure}

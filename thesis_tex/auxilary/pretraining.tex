@@ -1,0 +1,29 @@
+% !TEX root = ../thesis.tex
+
+\begin{algorithm}[H]
+ \KwData{X  \text{ (Train set)}}
+ \KwResult{$\theta \text{ (Learned weights)}$}
+
+ $\textbf{Require: } \sigma\text{: maximum blur distortion value}$
+
+ $\textbf{Require: } N \text{: number of pre-training steps}$
+
+ $\theta \gets \theta_0 \text{ (Xavier Initialization)}$
+
+ \For{i in N}{
+
+  $\sigma_i \gets (1 - \frac{i}{N})*\sigma \text{ (Calculate distortion parameter for current step)}$
+
+  $X_i \gets \text{ Select minibatch examples i.i.d. from $X$}$
+
+  $\hat{X_i} \gets \sigma(X_i, \sigma_i) \text{ (Apply distortion to the minibatch)}$
+
+  $\theta \gets train\_minibatch(\theta, \hat{X_i}) \text{ (Perform a training step using distorted input)}$
+
+ }
+
+ \Return $\theta$
+
+ \caption{Pre-training procedure for spatial-feature extraction}\label{alg:pretr}
+
+\end{algorithm}

@@ -142,13 +142,7 @@ Convolutional neurons typically share the parameters across a single feature map
 
 ReLU \cite{Nair2010}
 
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{backbone_1.png}
-  \caption{TensorFlow detailed graph representation of a single fully .}
-  \label{fig:tf_graph}
-\end{figure}
-% TODO: split into a, b images
+
 
 \subsection{WhatWhere autoencoder}
 
@@ -161,11 +155,18 @@ In the decoder part of the network in addition to transposed convolution \ref{ch
 
 We consider What-Where autoencoders to be useful for interpretable feature learning, since positional information flow should simplify the process of learning good image reconstruction. This simplification can possibly lead of lesser impact of the noisy $L_{reco}$ error on the learning process.
 
-\begin{figure}[h!]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{backbone_1.png}
+  \caption{TensorFlow detailed graph representation of a single fully .}
+  \label{fig:tf_graph_1}
+\end{figure}
+% TODO: split into a, b images
+\begin{figure}[H]
   \centering
     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{backbone_2.png}
   \caption{TensorFlow detailed graph representation of a single.}
-  \label{fig:tf_graph}
+  \label{fig:tf_graph_2}
 \end{figure}
 
 \section{Model pre-training}
@@ -188,7 +189,7 @@ We discovered that this instability can be explained by one of the next 2 factor
 \begin{enumerate}
   \item Extremely high compression rates. Trying to represent 76800 dimensional inputs in a 6- or lower-dimensional space is highly non trivial. Decreasing the compression rate always resulted in a more stable training.
   \item Noisy $L2$ loss. Neighboring pixels of a computer game images often have sharp differences and therefore are less correlated between each other.
-  While we are trying to discover special structure using pixel-wise means squared error (MSE), such low correlation can be detrimental to the learning process.
+  While we are trying to discover spacial structure using pixel-wise means squared error (MSE), such low correlation can be detrimental to the learning process.
   The reason is, that neighboring pixels can look as different from target value as remote pixels of the image.
   Which means that a small errors in the spacial transformations of the data can result in as high error as a large spacial transformations.
   These impedes learning process.
@@ -219,7 +220,7 @@ We perform pre-training in scheduled way, by decreasing $\sigma$ linearly during
 This allows smooth adaptation of the model parameters to the actual training data.
 Altogether, we summarize our algorithm on listing \ref{alg:pretr}.
 
-% \input{auxilary/pretraining}
+\input{auxilary/pretraining}
 % TODO: finish the thought, add some math
 
 \section{Manifold learning}\label{ss:mf}
@@ -287,7 +288,7 @@ This is especially true for changes of the angle of view ($\phi, \theta, \psi$),
 \begin{figure}[h!]
   \centering
     \includegraphics[width=0.85\textwidth,height=0.85\textheight, keepaspectratio]{prediction}
-  \caption{Approximating encoding of frame $x_3$ by the encodings of two previous frames $x1, x2$} on the manifold trajectory.
+  \caption{Approximating encoding of frame $x_3$ by the encodings of two previous frames $x1, x2$ on the manifold trajectory}.
   \label{fig:m_pred}
 \end{figure}
 
@@ -296,10 +297,51 @@ This is especially true for changes of the angle of view ($\phi, \theta, \psi$),
 \subsection{Denoising regularization}
 
 Early experiments showed largely uneven density of the manifold projection.
-In particular cases this lead to "lumps" of similar images concentrated in small region of the projection space.
-It appeared, that differences between the images within the lump and a rather similar reconstruction effected the training error only slightly comparing to more contrastive sequences.
-Which resulted in low gradient values comparable to noisy effect of more contrastive data. 
+In particular cases this led to \textit{lumps} of images concentrated in a small region of the projection space.
+Images in the same lump tend to show high similarity between each other.
+
+This behavior can be explained by largely uneven similarity between images across the training set.
+For instance, let's says a single step along some trajectory is represented by $N$ discrete time-steps and, therefore, $N$ distinct sequential image inputs.
+We can argue, that 2 distinct $N$-sequences from different parts of the trajectory might have highly different variation within the sequence.
+As, for example, a single step towards the wall would cause either significant or almost unnoticeable change of the view depending on the distance from the wall.
+
+High contrast of the degree of pair-wise image similarity across the dataset means, that alike errors in determining current position $p_i$ would cause highly uneven reconstruction error $L_{reco}$ depending on position $p_i$.
+This, in turn, would lead to smaller gradient values during the learning process.
+In the extreme case, gradients produced within regions of high similarity can be comparable or smaller than the noise of gradients of less similar regions.
+
+To resolve this issue we propose using noise injection in the manifold space.
+We suggest, that noisy embeddings would allow to enforce a minimum distance between prototypes in the embedding space.
+This minimum distance should allow to increase size of the regions around lumps, therefore effectively decreasing density in this regions.
+As a result, we expect high density regions to become more robust against gradient noise, produced by different inputs.
+
+% TODO: mathematics here
+
 
 \subsection{Density regularization}
 
-Low density regions
+Despite continuous nature of actors movements, we have access only to discretized data in form of video frames.
+This discretization sometimes results in sharp changes in the visual data in subsequent frames, that, in turn, leads to low-density regions in the manifold space.
+Within such a region we can not longer argue about local resemblance of the manifold to a Euclidean space, continuous assumption about data at hand does not hold any longer.
+
+Sharp changes in density of the manifold make it harder to argue about interpretability and quality of the learned concepts. Furthermore, our experiments has shown, that manifolds with large number of low density regions tend to create larger number of self intersections, further complicating the interpretation of the learned features.
+
+We, therefore propose a low-density regularization to account for regions with sharp changes.
+We suggest using an additional error term during the training phase to penalize large distances between consecutive frames, therefore dragging them closer together.
+Such regularization would compete with the reconstruction objective of the autoencoder network.
+But our main interest is interpretable feature extraction, not archiving perfect reconstruction of the images.
+
+Therefore, we calculate euclidean distance between pair of subsequent images:
+\begin{equation*}
+d(x_t, x_{t+1}) = \Big(\sum^i { (x_{t,i}-x_{t+1, i})^2}\Big)^{\frac{1}{2}}
+\end{equation*}
+And penalize distances exceeding certain constant value $d_{max}$:
+
+\begin{equation*}
+  L_{dens} = \gamma*\max(0, d(x_t, x_{t+1})-d_{max})
+\end{equation*}
+where $\gamma$ is a constant parameter defining contribution of the density regularization in total loss.
+
+
+Figure \ref{fig:model} summarizes our modification to the autoencoder architecture on a single schema.
+
+\input{auxilary/model}
