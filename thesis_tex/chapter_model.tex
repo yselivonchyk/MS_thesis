@@ -23,7 +23,9 @@ We use early stopping as the termination condition of the algorithm \ref{alg:bp}
 % TODO: get rid of that
 To select hyper-parameters of the model, such as weights $\alpha, \beta$ of a composite error $L=L_1 + \alpha L_2 + \beta L_3$, layer sizes etc. we perform a single grid search per parameter.
 Grid search is executed for a single parameter at a time, while other parameters stay fixed.
-In each grid search is performed for 3 values $\{p_1, p_2, p_3\}$. Whenever better results are achieved for border values $p_1$ or $p_3$, the grid is shifted in the direction of the winning value. When middle value $p_2$ shows the best result but the difference is significant grid search is repeated for decreased grid size.
+In each grid search is performed for 3 values $\{p_1, p_2, p_3\}$.
+Whenever better results are achieved for border values $p_1$ or $p_3$, the grid is shifted in the direction of the winning value.
+When middle value $p_2$ shows the best result but the difference is significant grid search is repeated for decreased grid size.
 When parameter shows no effect on model performance the value, that causes better computational efficiency of the model, is selected.
 
 \subsection{Model parameter initialization}
@@ -43,7 +45,8 @@ Another options might include layer-wise weight initialization, pre-training of 
 Yet, we would prefer the issue of weight initialization not to effect the training process.
 
 
-Xavier initializer suggest using normalized initialization, that depends on the number of input and output units of the layer \cite{Good2016}. Weight values are drown uniformly at random from the normal distribution $\Bbb{U}$:
+Xavier initializer suggest using normalized initialization, that depends on the number of input and output units of the layer \cite{Good2016}.
+Weight values are drown uniformly at random from the normal distribution $\Bbb{U}$:
 
 \begin{equation}\label{eq:xavier}
   w_{j, i} \sim \Bbb{U}(
@@ -86,14 +89,17 @@ Scaling is necessary, since activation functions as logistics sigmoid or hyperbo
 \subsection{Fully connected autoencoder}
 
 Fully connected layer of neural networks is a set of computational units, each of which relies on the full set of input parameters of the layer and produces a single output.
-We use computational units as described in the section \ref{eq:per}. We use logistics sigmoid as an activation function.
+We use computational units as described in the section \ref{eq:per}.
+We use logistics sigmoid as an activation function.
 In this form each fully connected layers with $n_{i-1}$ inputs and $n_i$ outputs rely on $|W_i|=n_{i-1}*(n_i+1)$ parameters.
 
 Work by Jaderberg et al. \cite{Jaderberg2015} suggests, that a fully connected neural network with a single hidden layer might be sufficient to capture spacial information about the input.
 In this work, a fully connected \textit{localization net} with a single hidden layer and small number of output units (up to 6) is used to produce transformation parameters for visual data input.
 We believe that this architecture represents the most trivial design and use it as a reference backbone model.
 
-Another group of authors successfully applied fully-connected autoencoder to learn latent input representation using Generative Moment-Matching networks \cite{Li2015}. In their experiment, fully connected autoencoders were able to construct dense manifold of the input. For small datasets as MNIST and Toronto Faces Dataset \cite{tfd,lecun-mnisthandwrittendigit-2010} up to 2 hidden layers in both encoder and decoder networks were sufficient.
+Another group of authors successfully applied fully-connected autoencoder to learn latent input representation using Generative Moment-Matching networks \cite{Li2015}.
+In their experiment, fully connected autoencoders were able to construct dense manifold of the input.
+For small datasets as MNIST and Toronto Faces Dataset \cite{tfd,lecun-mnisthandwrittendigit-2010} up to 2 hidden layers in both encoder and decoder networks were sufficient.
 
 Fully connected layers rely on huge number of parameters comparing to convolutional and deconvolutional layers.
 Number of parameters grows fast with increase in number of layers or number of output units.
@@ -120,9 +126,11 @@ What-where autoencoders store the positions of maximum-elements during max-pooli
 Given positional information decoder no longer have to "guess" the relative position of pooled features during upsampling.
 
 What-where autoencoders in the encoder part use the same architecture as convolutional counterpart.
-In the decoder part of the network in addition to transposed convolution an updated upsampling operation is used. Updated upsampling operation called \textit{unpooling} is described in section \ref{ch:unp}.
+In the decoder part of the network in addition to transposed convolution an updated upsampling operation is used.
+Updated upsampling operation called \textit{unpooling} is described in section \ref{ch:unp}.
 
-We consider What-Where autoencoders to be useful for interpretable feature learning, since positional information flow should simplify the process of learning good image reconstruction. This simplification can possibly lead of lesser impact of the noisy $L_{reco}$ error on the learning process.
+We consider What-Where autoencoders to be useful for interpretable feature learning, since positional information flow should simplify the process of learning good image reconstruction.
+This simplification can possibly lead of lesser impact of the noisy $L_{reco}$ error on the learning process.
 
 \begin{figure}[H]
   \centering

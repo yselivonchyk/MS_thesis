@@ -12,15 +12,34 @@ Outline:
 - analyses description
 
 Space-time video completion \cite{Wexler2004}
-Rationalizing Neural Prediction \cite{Lei2016}
-Deep learning for visual understanding: A review \cite{Guo2016}
-Spatial Transformer Networks \cite{Jaderberg2015}
+% Deep learning for visual understanding: A review \cite{Guo2016}
 
 Loop closure detection for visual SLAM systems using deep neural networks \cite{Gao2015}
 Authors build a denoising autoencoder with sparse objective adding continuity objective.
 Continuity objective enforces L2 similarity between extracted features for consecutive frames. They use dataset: freiburg2 slam.
 
-Loop closure:
 Loop Closure Detection for Visual SLAM Using PCANet Features.
 Unsupervised learning to detect loops using deep neural networks for visual SLAM system.
 VLAD-Based Loop Closure Detection For Monocular SLAM \cite{Xia2016, Gao2015a, Huang2016}
+
+Localization tasks represent a significant challenge in robotics and artificial intelligence tasks \cite{localization, AI} and has many potential applications in simultaneous localization and mapping (SLAM), loop closure detection, correspondence learning and video compression.
+While most of these tasks rely on labeled training data, in this work we make an attempt to extract interpretable spatial features from abundant unlabeled video data.
+Recent developments in Q-learning opened access to a wide audience to 3d-rendering tools allowing to generate large amounts of video data in controlled and timely manner.
+Access to such tools has proven to be useful and crucial to artificial intelligence tasks as Q-learning.
+
+For any given environment (say, a room or a computer game map) without moving objects we can exactly describe the view of a actor (player, person) by its current position and the direction of the view.
+This allows us to state, that every single image observed by the actor can be unambiguous encoded by a small set of latent variables.
+Furthermore, from a continuous nature of actors movement we can expect these variables to form a dense continuous manifold in some space of latent variables.
+Given that observation, we expect to reconstruct a manifold of players movement in the latent space using a model based on a deep neural network.
+
+Several models has been successfully applied to unlabeled data allowing to construct a dense manifold representation of some visual concepts \cite{Li2015, Kingma2013, Goodfellow2014}.
+While these techniques succeeded in encoding data in a low-dimensional space of independent features, they make no assumption about the nature of these feature.
+We expect, that extremely low-dimensional representation of the data, depending of the spacial relation, would be tightly coupled with that spatial relation.
+To enforce this expectation we apply additional constrains to our model to enforce continuous feature extraction.
+Adding some interpretability constrain to the model often results in a decrease of the quality of the primary objective \cite{Lei2016}.
+
+In case of success our model is expected to act as a direct and inverse graphics engine.
+In other words, we will be able to project a view of the environment from any given position and vise-versa: reconstruct a map position from the players view.
+This model can behave as an ultimate solution for SLAM, correspondence and loop detection problems. In that particular case the model itself should learn every detail of the static environment being learned. We understand, that that goal is unlikely to be fully archived, given limited computational resources and discrete nature of actual video data.
+
+Later chapters are organized as follows. We continue current discussion in chapter \ref{ch:rewo} by describing resent research advances relevant to our task at hand. In chapter \ref{ch:tede} we provide technical details of artificial neural network structure, relevant to our task. Chapter \ref{ch:mode} describes our learning technique and additional model constrains along with underlying motivation. Finally, in chapter \ref{ch:eval} we explore the advantages of our method on actual data. Chapter \ref{ch:conc} concludes the results of our research.
