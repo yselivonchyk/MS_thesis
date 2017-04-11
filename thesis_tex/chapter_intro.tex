@@ -3,43 +3,54 @@
 \chapter{Introduction}
 \label{ch:intro}
 
-Outline:
-- successes of Neural network models
-- specifically for spacial related field (spatial transformer network, video thing)
-- VizDoom and
-- we propose
-- potential usages of the proposed system: SLAM, loop closure detection
-- analyses description
+% Outline:
+% - successes of Neural network models
+% - specifically for spacial related field (spatial transformer network, video thing)
+% - VizDoom and
+% - we propose
+% - potential usages of the proposed system: SLAM, loop closure detection
+% - analyses description
+%
+% Space-time video completion \cite{Wexler2004}
+% % Deep learning for visual understanding: A review \cite{Guo2016}
+%
+% Loop closure detection for visual SLAM systems using deep neural networks \cite{Gao2015}
+% Authors build a denoising autoencoder with sparse objective adding continuity objective.
+% Continuity objective enforces L2 similarity between extracted features for consecutive frames. They use dataset: freiburg2 slam.
+%
+% Loop Closure Detection for Visual SLAM Using PCANet Features.
+% Unsupervised learning to detect loops using deep neural networks for visual SLAM system.
+% VLAD-Based Loop Closure Detection For Monocular SLAM \cite{Xia2016, Gao2015a, Huang2016}
 
-Space-time video completion \cite{Wexler2004}
-% Deep learning for visual understanding: A review \cite{Guo2016}
+Localization tasks represent a significant challenge in artificial intelligence (AI).
+In particular, successful localization is extremely important to such AI areas as robotics, self-driving vehicles, and micro-surgery, to name a few \cite{Wang2017, Mountney2006}.
+It has many potential applications in simultaneous localization and mapping (SLAM) \cite{Cadena2015, Zikos2016}, loop closure detection \cite{Xia2016, Gao2015a, Huang2016}, and correspondence learning \cite{Boscaini2016}.
+These tasks are normally trained with labeled data, which is often limited and hard to collect.
+Meanwhile, recent successes in reinforce learning \cite{Silver, Lample2016} has shown, that given access to powerful models and abundant amount of training data, learning can be done in loosely supervised way.
+We are going to take advantage of these developments, by reusing the robust training data generation techniques used in reinforcement learning, such as game 3D engines \cite{Brockman2016, Kempka2016} and apply them to the localization task in an unsupervised way .
 
-Loop closure detection for visual SLAM systems using deep neural networks \cite{Gao2015}
-Authors build a denoising autoencoder with sparse objective adding continuity objective.
-Continuity objective enforces L2 similarity between extracted features for consecutive frames. They use dataset: freiburg2 slam.
-
-Loop Closure Detection for Visual SLAM Using PCANet Features.
-Unsupervised learning to detect loops using deep neural networks for visual SLAM system.
-VLAD-Based Loop Closure Detection For Monocular SLAM \cite{Xia2016, Gao2015a, Huang2016}
-
-Localization tasks represent a significant challenge in robotics and artificial intelligence tasks \cite{localization, AI} and has many potential applications in simultaneous localization and mapping (SLAM), loop closure detection, correspondence learning and video compression.
-While most of these tasks rely on labeled training data, in this work we make an attempt to extract interpretable spatial features from abundant unlabeled video data.
-Recent developments in Q-learning opened access to a wide audience to 3d-rendering tools allowing to generate large amounts of video data in controlled and timely manner.
-Access to such tools has proven to be useful and crucial to artificial intelligence tasks as Q-learning.
-
-For any given environment (say, a room or a computer game map) without moving objects we can exactly describe the view of a actor (player, person) by its current position and the direction of the view.
+We expect localization task to be possible to learn in an unsupervised manner.
+For any given static environment (say, a room or a map of a computer game ) we can exactly describe the view of an actor (player, person) by its current position and the direction of the view.
 This allows us to state, that every single image observed by the actor can be unambiguous encoded by a small set of latent variables.
 Furthermore, from a continuous nature of actors movement we can expect these variables to form a dense continuous manifold in some space of latent variables.
 Given that observation, we expect to reconstruct a manifold of players movement in the latent space using a model based on a deep neural network.
 
 Several models has been successfully applied to unlabeled data allowing to construct a dense manifold representation of some visual concepts \cite{Li2015, Kingma2013, Goodfellow2014}.
-While these techniques succeeded in encoding data in a low-dimensional space of independent features, they make no assumption about the nature of these feature.
-We expect, that extremely low-dimensional representation of the data, depending of the spacial relation, would be tightly coupled with that spatial relation.
+While these techniques succeeded in encoding data in a lower dimensional space of independent features, they make no assumption about the nature of these features.
+We expect, that extremely low-dimensional representation of the spatially related data  would be tightly coupled with that spatial relation.
 To enforce this expectation we apply additional constrains to our model to enforce continuous feature extraction.
-Adding some interpretability constrain to the model often results in a decrease of the quality of the primary objective \cite{Lei2016}.
+Existing research on extracting interpretable features suggest, that such extraction is possible, although generally has detrimental effect the performance of the model \cite{Lei2016, Kulkarni2015}.
 
-In case of success our model is expected to act as a direct and inverse graphics engine.
-In other words, we will be able to project a view of the environment from any given position and vise-versa: reconstruct a map position from the players view.
-This model can behave as an ultimate solution for SLAM, correspondence and loop detection problems. In that particular case the model itself should learn every detail of the static environment being learned. We understand, that that goal is unlikely to be fully archived, given limited computational resources and discrete nature of actual video data.
+An ultimate goal of this project can be viewed as a direct and inverse graphics engine in form of an autoencoder.
+The goal can be described as achieving an autoencoder objective in form of perfect image reconstruction, while producing a dense continuous spatial manifold in the latent feature space.
+Successfully achieving this goal, we will be able to produce players view given the position and vise-versa: determine possible position of the player by the current view.
+This model can behave as an ultimate solution for SLAM, correspondence and loop detection problems.
+In that particular case the model itself should learn every detail of the static environment being learned.
+We understand, that that goal is unlikely to be fully archived, given limited computational resources, discrete nature of actual training data and often non-static characteristics of real-world environments.
 
-Later chapters are organized as follows. We continue current discussion in chapter \ref{ch:rewo} by describing resent research advances relevant to our task at hand. In chapter \ref{ch:tede} we provide technical details of artificial neural network structure, relevant to our task. Chapter \ref{ch:mode} describes our learning technique and additional model constrains along with underlying motivation. Finally, in chapter \ref{ch:eval} we explore the advantages of our method on actual data. Chapter \ref{ch:conc} concludes the results of our research.
+Later chapters are organized as follows.
+We continue current discussion in chapter \ref{ch:rewo} by describing resent research advances, relevant to the task at hand.
+In chapter \ref{ch:tede} we provide technical details of artificial neural network structure, relevant to our task.
+Chapter \ref{ch:mode} describes our learning technique and additional model constrains along with underlying motivation.
+Finally, in chapter \ref{ch:eval} we explore the advantages of our method on actual data.
+Chapter \ref{ch:conc} concludes the results of our research.

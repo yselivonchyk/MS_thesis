@@ -4,36 +4,39 @@
 
 In context of our task we would like to pay attention to two subgroups of deep models.
 First of all, we are interested in models focusing on producing interpretable results.
-Second of all, learning from unlabeled data, we are interested in unsupervised learning techniques.
+Second of all, while learning from unlabeled data, we are interested in unsupervised learning techniques.
 
-Neural network models has proven to be extremely successful in tasks like image recognition, speech recognition, translation, natural language processing etc. \cite{}.
-Large interest has been shown in interpreting neural network results in connection to training data \cite{Yosinski2015, Mahendran2014, Zeiler2014, Lei2016}.
-The reasons for that includes pure scientific curiosity, legal reasons or improving the robustness of neural networks against adversaries \cite{Goodfellow2015}.
+Neural network models has proven to be extremely successful in artificial intelligence domains as computer vision \cite{ILSVRC15}, natural language processing \cite{NIPS2013_5021}, semantic parsing \cite{bordes2012}, and many other.
+With that success scientific community has shown a large interested in producing interpretable results, that might give an insight into work of such models \cite{Yosinski2015, Mahendran2014, Zeiler2014, Lei2016}.
+The reasons for that include pure scientific curiosity, legal reasons, and improving the robustness of neural networks \cite{Goodfellow2015}.
 
-One of the trends of producing interpretable features is using auxiliary subnetwork with \textit{interpretability} constrains.
-For example, Spatial Transformer Networks \cite{Jaderberg2015} use an additional neural path to extract parameters for best image transformation before feeding it into the discriminative part of the model.
+In deep learning domain one of the common ways to produce interpretable results is by applying an additional constrain, enforcing certain form or structure of intermediate network representation  \cite{Jaderberg2015, Lei2016, Kulkarni2015}.
+The constrain function can take form of a simple handcrafted regularization, as a sparsity constrain \cite{Ng2011}, as well as be realized by a dedicated complex subnetwork \cite{Lei2016, Li2015}.
+For example, Spatial Transformer Networks \cite{Jaderberg2015} use an additional routine in the neural network to extract parameters for best image transformation before feeding it into the discriminative part of the model.
 Other group of authors proposed a technique for rationalization of text classification by restricting neural network to build predictions based on a connected peaces of input text \cite{Lei2016}.
 Later technique showed to produce human interpretable results at a price of lower classification accuracy.
+
+A large body of research is dedicated to unsupervised learning techniques on visual data.
 
 One popular class of unsupervised learners is a group of energy-based models.
 Restricted Boltzmann machines and Deep Boltzmann machines are among the most prominent members of that group \cite{Ackley1985, Salakhutdinov2009}.
 Restricted Boltzmann machine is an undirected graphical model based on a bipartite graph structure.
 They learn dependency between input distribution and latent distribution in form of intractable partition function.
-Such representation is typically hard to use in both learning and evaluation and usually relies on the computationally expensive Monte Carlo Markov Chain method.
+Such representation is typically hard to use in both learning and evaluation and usually relies on the computationally expensive Monte Carlo Markov Chain method (MCMC).
 
-A large body of research is dedicated to Autoencoder based models.
+Recently, more attention has been given to deep neural models based on Autoencoder paradigm.
 Autoencoder is an artificial neural network allowing to compress unlabeled data into a lower dimensional space.
 Autoencoders learn by simultaneously projecting data into a more compact representation (encoding) and reconstructing original input from the compressed form (decoding).
-Several autoencoder models has lead to advances in computer vision.
+Several autoencoder models has led to advances in computer vision tasks.
 Stacked convolutional autoencoders allow to archive better results on image classification task \cite{Masci2011}.
 Stacked denoising autoencoders showed still better results by learning from data altered by random noise  \cite{Vincent2010}.
 Stacked What-Where Auto-encoders allowed to apply models of the kind to broader range of training datasets \cite{Zhao2015}.
 Yet, one the most fascinating results in resent years has been achieved by generative models based on autoencoder paradigm.
 
-Generative Moment Matching Networks (GMMNs) \cite{Li2015, Ren2016} propose using a additional generative network to create new input examples in the feature space of an autoencoder.
-GMMNs auxiliary network maps randomly generated noise into outputs, that resemble target data distribution.
-GMMNs' learning objective is to generate inputs with similar statistics as the training data.
-This approach allows to perform input generation by a single pass through the trained network, which is advantageous comparing to costly MCMC sampling.
+Generative Moment Matching Networks (GMMNs) \cite{Li2015, Ren2016} augment autoencoder architecture with additional projector network for purposes of data generation.
+Projector network maps Gaussian noise of the known form into the encoding space of autoencoder in such a way, that the decodings of the that mapping resembles true data distribution.
+The learning objective of the projection network is to generate inputs with similar statistics as the training data.
+Using this approach it becomes possible to generate new data by a single pass through the trained network, which is advantageous comparing to costly MCMC sampling.
 Method uses stochastic gradient descent for training.
 GMMNs author claim that this architecture learns latent manifold on which the data has high density and that generative process yields highly realistic images.
 Yet, this approach does not attempt to extract interpretable latent features.
@@ -60,23 +63,26 @@ Sparse autoencoders impose additional sparsity constrain on the encoding space.
 Such a constrain enforces encoder to have low average activation on the output layer, which highly resembles a neural network trained for classification.
 Autoencoder trained this way can be used for initialization of a classification network of a similar architecture.
 
+Unsupervised learning of interpretable concepts received little attention in the literature.
+
 Deep convolution inverse graphics networks (DC-IGNs) make an attempt to extract interpretable features out of visual data \cite{Kulkarni2015}.
 DC-IGNs are trained to extract representation of the relevant features, such as spatial orientation of an object or position of a light source.
 Ideally, this should allow to manipulate values of the learned features for new inputs.
 This approach develops on the idea of VAEs by adding a second encoding space, not controlled by variational objective, for interpretable features.
-Network is trained on sequences, depicting relevant feature transformation i.e. changing orientation of a single object in horizontal plane.
+Network is trained on sequences, depicting relevant feature transformation i.e. changing orientation of a single object in horizontal or vertical plane, or the position of the light source.
 This process still requires labeled sequences of visual data for learning process.
 We find this model the most relevant for our tasks at hand: learning interpretable latent features from unlabeled visual data.
 
 The work on Understanding Visual Concepts with Continuation Learning \cite{Whitney2016} generalizes approach of DC-IGNs for image sequences.
-Their approach is based on the idea, that image $t+1$ in a sequence can be reconstructed with high quality by decoding latent representation of the image $t$, given some low-dimensional information about transformation between two images.
-To achieve that they train autoencoder using pairs of subsequent images.
+Their approach is based on the idea, that in a sequence of images image $t+1$ can be reconstructed with high quality by decoding latent representation of the image $t$, given some low-dimensional information about transformation between two images.
+To achieve that authors train autoencoder using pairs of subsequent images.
 Autoencoder is supposed to reconstruct an image, given encoding of a previous image and some sparse vector, representing transformation.
 Transformation is extracted with additional \textit{gating} layer, that has access to information about both images.
 
 At last, it worth mentioning recent progress in neuroscience, which is a common source of inspiration when it comes to designing a neural networks.
 There are several discovered types of neurons in mammal brain, responsible for the spatial perception.
 \textit{Place cells} is one of the most well-studied class of cells responsible for storing information about current location \cite{Fenton2009, Hartley2014}.
+A small number of place cells are active at a time, indicating the current location of the mammal
 \textit{Head direction cells} is another group of cells, few of which are firing depending on the current direction of the view \cite{Taube1990, Taube1990a}.
 The last major group is \textit{grid cells}, that are responsible for tracking the spatial position within an environment in accordance to individual's movements \cite{Moser2008}.
 Within a group of grid cells only few neurons are active at a time and typically newly activated neurons are neighbors of the recently active ones, creating a hexagonal grid-like pattern of activations.
