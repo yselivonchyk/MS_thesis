@@ -25,21 +25,22 @@
 Localization tasks represent a significant challenge in artificial intelligence (AI).
 In particular, successful localization is extremely important to such AI areas as robotics, self-driving vehicles, and micro-surgery, to name a few \cite{Wang2017, Mountney2006}.
 It has many potential applications in simultaneous localization and mapping (SLAM) \cite{Cadena2015, Zikos2016}, loop closure detection \cite{Xia2016, Gao2015a, Huang2016}, and correspondence learning \cite{Boscaini2016}.
-These tasks are normally trained with labeled data, which is often limited and hard to collect.
+These tasks are normally trained with labeled data, which is often limited and difficult to collect.
 Meanwhile, recent successes in reinforce learning \cite{Silver, Lample2016} has shown, that given access to powerful models and abundant amount of training data, learning can be done in loosely supervised way.
-We are going to take advantage of these developments, by reusing the robust training data generation techniques used in reinforcement learning, such as game 3D engines \cite{Brockman2016, Kempka2016} and apply them to the localization task in an unsupervised way .
+Important aspect of such training is availability of gaming engines, that can create large amounts of training data on the go.
+We are going to take advantage of these developments, by reusing these data generation techniques for learning localization from unlabeled data.
 
 We expect localization task to be possible to learn in an unsupervised manner.
-For any given static environment (say, a room or a map of a computer game ) we can exactly describe the view of an actor (player, person) by its current position and the direction of the view.
+For a given static environment (say, a room or a map of a computer game) we can exactly describe the view of an actor (player, person) by its current position and the direction of the view.
 This allows us to state, that every single image observed by the actor can be unambiguous encoded by a small set of latent variables.
 Furthermore, from a continuous nature of actors movement we can expect these variables to form a dense continuous manifold in some space of latent variables.
-Given that observation, we expect to reconstruct a manifold of players movement in the latent space using a model based on a deep neural network.
+Given that such a manifold exists, we try to construct it in an unsupervised way with a deep neural network model.
 
 Several models has been successfully applied to unlabeled data allowing to construct a dense manifold representation of some visual concepts \cite{Li2015, Kingma2013, Goodfellow2014}.
 While these techniques succeeded in encoding data in a lower dimensional space of independent features, they make no assumption about the nature of these features.
-We expect, that extremely low-dimensional representation of the spatially related data  would be tightly coupled with that spatial relation.
-To enforce this expectation we apply additional constrains to our model to enforce continuous feature extraction.
-Existing research on extracting interpretable features suggest, that such extraction is possible, although generally has detrimental effect the performance of the model \cite{Lei2016, Kulkarni2015}.
+We expect, that extremely low-dimensional representation of the spatially related data  would be tightly coupled with that spatial information.
+To enforce this expectation we apply additional constrains to our model to enforce extraction of continuous feature.
+Existing research on extracting interpretable features suggest, that such extraction is possible, although might have detrimental effect the performance of the model \cite{Lei2016, Kulkarni2015}.
 
 An ultimate goal of this project can be viewed as a direct and inverse graphics engine in form of an autoencoder.
 The goal can be described as achieving an autoencoder objective in form of perfect image reconstruction, while producing a dense continuous spatial manifold in the latent feature space.
