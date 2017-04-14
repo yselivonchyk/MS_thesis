@@ -21,16 +21,17 @@ ViZDoom is a Doom-based platform for reinforcement learning.
 It provides access to raw visual data from the Doom gaming engine.
 Doom is a first-person shooter (FPS) computer game utilizing 3D graphics.
 In context of our research the ViZDoom platform allows automatic visual data generation and collection.
+Example of the output image is shown on figure \ref{fig:doom}.
 
 We created multiple Doom maps specifically for our task using the Slade \cite{Slade3} software.
 Created maps provide high diversity of textures for better discrimination between images, captured from different positions on the map.
 Other reason for diverse structures on the map is to explicitly brake symmetry of the map.
-Symmetric maps look alike from different player positions.
+Symmetric maps look alike from different player positions which leads to entangled manifolds in feature space.
 Such position tend to be encoded with the same values of sparse features.
 This represents a difficulty for evaluation and comparison of quality of sparse features.
 
 We record multiple movement trajectories on each map.
-More specifically, we record 10000-60000 consecutive images of unstructured movement of the player on the map for training purposes.
+More specifically, we record 10000-300000 consecutive images of unstructured movement of the player on the map for training purposes.
 In addition to that, we record movement along well defined structured trajectories as a "circle" or an "eight" for model evaluation and comparison of quality of extracted features.
 
 
@@ -49,7 +50,34 @@ Say few words about how your datasets look like and what trajectories you follow
 
 Tell what is on the pictures
 
+\section{Model comparison}
 
 
-\section{Baseline models}
-\section{Schedule learning}
+
+\subsection{Backbone model comparison}
+
+
+\subsection{Regularization}
+
+
+\subsection{Dataset complexity}
+
+
+\subsection{Relevance of depth information}
+
+
+\section{Predictive evaluation}
+
+Describe proposed metrics and justify the usage.
+
+\section{Loop closure detection}
+
+Compare to \cite{Xia2016} on Freiburg2 dataset for loop closure.
+
+\section{Manifold construction}
+
+Compare to \cite{Jaderberg2015} in terms of how valuable the representation comparing to their results.
+
+\section{Topology reconstruction}
+
+Shall be removed(
