@@ -44,11 +44,25 @@ In addition to that, we record movement along well defined structured trajectori
 
 \subsection{Dataset description}
 
-Say few words about how your datasets look like and what trajectories you follow
+We collect multiple sets of visual data with varying complexity of players movement.
+We can specify next 3 classes of trajectories used either for training or evaluation:
+\begin{itemize}
+  \item Continuous closed trajectory without intersection. A circular movement is one example of such trajectory.
+  \item Continuous closed trajectory with intersection. An \text{eight} is an example of such trajectory.
+  \item Continuous random movement across the environment (map).
+\end{itemize}
+
+Furthermore, we introduce multiple complexity levels of movement across trajectories by reducing degrees of freedom of such movements:
+\begin{itemize}
+  \item Most restricted. Only movement along a single axis at a time is possible. This category includes movements across rectangular trajectories while maintaining fixed direction of the view or changing the direction of the view while standing still. This category provides includes trajectories of the lowest complexity.
+  \item Less restricted. Multiple degrees of freedom at a time allowed. For example, movement along multiple axis facing one direction or forward movement while changing the direction of the view.
+  \item Free movement across the map with no restrictions.
+\end{itemize}
+
 
 \subsection{Data format}
 
-Tell what is on the pictures
+We collect RGBD images from the 3D engine. Each image has resolution of 160 by 120 pixels. Each pixel is describe by 3 color channels and a single distance channel. Each channel can take a discrete value between 0 and 255 including. This format results in 76800 dimensional inputs.
 
 \section{Model comparison}
 
@@ -72,7 +86,7 @@ Describe proposed metrics and justify the usage.
 
 \section{Loop closure detection}
 
-Compare to \cite{Xia2016} on Freiburg2 dataset for loop closure.
+Compare to \cite{Xia2016} on Freiburg2 dataset for loop closure detection.
 
 \section{Manifold construction}
 
