@@ -68,6 +68,22 @@ We collect RGBD images from the 3D engine. Each image has resolution of 160 by 1
 
 
 
+\section{Predictive evaluation}
+
+Evaluation of the performance of unsupervised models is inherently difficult.
+Discriminative models typically use well-defined metrics with clear quantifiable outputs, as classification accuracy, F-measure etc. Unsupervised models generally have no access to such metrics.
+Solutions for some under-defined objectives, as finding image super-resolution or generating new data samples, can be evaluated by involving manual human grading, which is costly and time-consuming \cite{Dahl2017, Goodfellow2014}.
+Other models rely on the primary learning objective, which is not necessarily representative of the actual model performance. As, for example, minimizing MSE for image comparison can result in low-quality blurry results, or matching certain characteristics of natural probability distribution in a generative process does not guarantee realistically looking generated data \cite{Li2015, Mathieu2015}. At last, some unsupervised learning techniques can be evaluated through performance on real world tasks by showing, that results of unsupervised learning can improve performance of discriminative models. For example, reusing network weights of denoising and contractive autoencoders led to improved classification results \cite{Rifai2011, Vincent2010}, as well reusing weights of word embeddings \cite{NIPS2013_5021} led to increased performance on a number of natural language processing tasks.
+
+In context of this work we would like to have access to a concise measure for comparison of model designs.
+Primary objective of an autoencoder -- good reconstruction of the input image -- is not very descriptive, since it makes no assumption about the spatial characteristics of the extracted features. Nevertheless, we provide our reconstruction loss values with the experiments.
+
+We are going to use \textit{predictive evaluation} as a main mean of model comparison from perspective of spatial feature extraction. With the predictive objective we would like to evaluate the quality of extracted spatial features. We do that by considering local resemblance of the manifold to an euclidean space. But, since we are working with unlabeled data another assumption is required. Namely, for any trajectory of actors movement we expect, that the best approximation of the transition between current and next step to be equivalent to the transition between previous and current step (when only last two frames are available for performing the prediction). We, therefore try to predict spatial position of the player on the next step on the manifold calculating it as $\hat{x}_{t+1} = x_t + (x_t- x_{t-1})$. Figure \ref{fig:m_pred} illustrates the process. Since different models have different deformations of manifold space and, therefore, might differ in terms of absolute values of the $L_2$ loss between predicted and actual location $L_2(\hat{x}_{t+1}, x_{t+1})$, we use relative improvement as a reference. We compare the improvement of prediction over a naive prediction $\tilde{x}_{t+1} = x_t$.
+
+Note, that similar technique is used as a model regularization. Yet, predictive regularization is applied as a reconstruction error and does not have direct effect on the predictive metric. For example, an decoder of large enough capacity can have very low reconstruction error of both actual encoding $x_{t+1}$ and predictive encoding $\hat{x}_{t+1}$, but low score of predictive evaluation. This can happen when two prototypes in the embedding space $x_{t+1}$ and $\hat{x}_{t+1}$ have distinct difference, but are still reconstructed as alike images due to overfitting appearing in the decoder network.
+
+% TODO: finish it: analyze the overfitting in the decoder network in relation to predictive evaluation
+
 \subsection{Backbone model comparison}
 
 
@@ -80,9 +96,7 @@ We collect RGBD images from the 3D engine. Each image has resolution of 160 by 1
 \subsection{Relevance of depth information}
 
 
-\section{Predictive evaluation}
 
-Describe proposed metrics and justify the usage.
 
 \section{Loop closure detection}
 
