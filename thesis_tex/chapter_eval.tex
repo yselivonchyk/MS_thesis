@@ -3,10 +3,10 @@
 \chapter{Evaluation}
 \label{ch:eval}
 
-Finding a definite good evaluation method for unsupervised models is a long-standing and inherent problem.
+Finding a definite good evaluation method for unsupervised models is a long-standing and inherent problem \cite{Li2015}. In this section we describe our evaluation techniques along with data collection process. We introduce two task-independent metrics to evaluate the qualities of the extracted manifold. Further we discuss possible applications of the model to real-world data.
 
 
-\section{Evaluation dataset}
+\section{Evaluation data}
 \subsection{Data collection}
 
 Access to large amount of training data is crucial for applying deep learning models.
@@ -64,9 +64,6 @@ Furthermore, we introduce multiple complexity levels of movement across trajecto
 
 We collect RGBD images from the 3D engine. Each image has resolution of 160 by 120 pixels. Each pixel is describe by 3 color channels and a single distance channel. Each channel can take a discrete value between 0 and 255 including. This format results in 76800 dimensional inputs.
 
-\section{Model comparison}
-
-
 
 \section{Predictive evaluation}
 
@@ -78,13 +75,41 @@ Other models rely on the primary learning objective, which is not necessarily re
 In context of this work we would like to have access to a concise measure for comparison of model designs.
 Primary objective of an autoencoder -- good reconstruction of the input image -- is not very descriptive, since it makes no assumption about the spatial characteristics of the extracted features. Nevertheless, we provide our reconstruction loss values with the experiments.
 
-We are going to use \textit{predictive evaluation} as a main mean of model comparison from perspective of spatial feature extraction. With the predictive objective we would like to evaluate the quality of extracted spatial features. We do that by considering local resemblance of the manifold to an euclidean space. But, since we are working with unlabeled data another assumption is required. Namely, for any trajectory of actors movement we expect, that the best approximation of the transition between current and next step to be equivalent to the transition between previous and current step (when only last two frames are available for performing the prediction). We, therefore try to predict spatial position of the player on the next step on the manifold calculating it as $\hat{x}_{t+1} = x_t + (x_t- x_{t-1})$. Figure \ref{fig:m_pred} illustrates the process. Since different models have different deformations of manifold space and, therefore, might differ in terms of absolute values of the $L_2$ loss between predicted and actual location $L_2(\hat{x}_{t+1}, x_{t+1})$, we use relative improvement as a reference. We compare the improvement of prediction over a naive prediction $\tilde{x}_{t+1} = x_t$.
+We are going to use \textit{predictive evaluation} as a main mean of model comparison from perspective of spatial feature extraction. With the predictive objective we would like to evaluate the quality of extracted spatial features. We do that by considering local resemblance of the manifold to an euclidean space. But, since we are working with unlabeled data another assumption is required. Namely, for any trajectory of actors movement we expect, that the best approximation of the transition between current and next step to be equivalent to the transition between previous and current step (when only last two frames are available for performing the prediction). We, therefore try to predict spatial position of the player on the next step on the manifold calculating it as $\hat{x}_{t+1} = x_t + (x_t- x_{t-1})$. Figure \ref{fig:m_pred} illustrates the process.
+Since different models have different deformations of manifold space and, therefore, might differ in terms of absolute values of the $L_2$ loss between predicted and actual location $L_2(\hat{x}_{t+1}, x_{t+1})$, we use relative improvement as a reference. We compare the improvement of prediction over a naive prediction $\tilde{x}_{t+1} = x_t$. We therefore define predictive metric as follows:
+\begin{equation}
+  P_{L2} = \frac{1}{N-2}\sum^{N-1}_{i=2}{L_2(\hat{x}_{i+1}, x_{i+1})} - {L_2(x_i, x_{i+1})}
+\end{equation}
+, where $N$ is a number of inputs in the validation set. Prediction is possible only for elements starting from the 3rd, therefore first two images do not contribute to the metric.
 
-Note, that similar technique is used as a model regularization. Yet, predictive regularization is applied as a reconstruction error and does not have direct effect on the predictive metric. For example, an decoder of large enough capacity can have very low reconstruction error of both actual encoding $x_{t+1}$ and predictive encoding $\hat{x}_{t+1}$, but low score of predictive evaluation. This can happen when two prototypes in the embedding space $x_{t+1}$ and $\hat{x}_{t+1}$ have distinct difference, but are still reconstructed as alike images due to overfitting appearing in the decoder network.
+Note, that similar technique is used as a model regularization. Yet, predictive regularization is applied as a reconstruction error and does not have direct effect on the predictive metric. For example, an decoder of large enough capacity can have very low reconstruction error of both actual encoding $x_{t+1}$ and predictive encoding $\hat{x}_{t+1}$, but low score of predictive evaluation. This can happen when two prototypes in the embedding space $x_{t+1}$ and $\hat{x}_{t+1}$ have distinct difference, but are still reconstructed as alike images. This case can be explained by overfitting in the decoder network.
 
-% TODO: finish it: analyze the overfitting in the decoder network in relation to predictive evaluation
+To counter high sensitivity of the $L_2$ error function to outliers we also calculate another flavor of the described metric: \textit{binary predictive evaluation}. The total $L_2$ loss value on the complete validation set can increase sharply with presence of a few outliers. In this case, while overall quality of the manifold might have desired properties for majority of the inputs, it can still produce very high error during the validation. This can happen since $L_2$ error does not take into account varying density of the manifold. To counter that, we introduce a similar simplified version of predictive metric, namely producing its binary form. Binary predictive metric simply compares the distance between \textit{naive prediction} (current frame) and the prediction calculate as above to the actual point.
+
+
+\subsection{Preserving nearest neighbor relation}
+
+Another key characteristic of the desired encoding function is high interpretability of the feature manifold.
+
+
+
+\section{Model comparison}
 
 \subsection{Backbone model comparison}
+
+\begin{table}
+\begin{center}
+    \begin{tabular}{| l | l | l | l |}
+    \hline
+    Model  & Predictive & Reconstruction & 009 \\ \hline
+    FC	   & 0.082 	    & 0.204	         & 615 \\ \hline
+    CNN 	 & 0.116 	    & 0.271 	       & 549 \\ \hline
+    WW 	   & 0.287 	    & 0.429 	       & 221 \\ \hline
+    \end{tabular}
+\end{center}
+  \caption{Predicted and actual result of kernel approximation on synthetic dataset}
+  \label{tab:kernel}
+\end{table}
 
 
 \subsection{Regularization}

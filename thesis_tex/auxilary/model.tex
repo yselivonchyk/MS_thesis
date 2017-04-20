@@ -135,6 +135,6 @@
 
 %   \draw (0,-1) -- (4,-1);
 \end{tikzpicture}
-\caption{Spatial feature extractor with regularization terms. Loss-term $L_{x*}$ represents reconstruction loss, which is typically based on mean-squared error but might vary depending on the underlying autoencoder architecture.}
+\caption{Spatial feature extractor with regularization terms. Loss-term $L_{x*}$ represents reconstruction loss, which is typically based on mean-squared error but might vary depending on the underlying autoencoder architecture. Model training depends on 5 hyper-parameters: $\alpha, \beta, \gamma, \epsilon, d_{max}$. Instances of encoder and decoder networks rely on shared weights.}
 \label{fig:model}
 \end{figure}
