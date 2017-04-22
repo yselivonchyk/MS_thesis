@@ -191,7 +191,7 @@ In this subsection we try to analyze effects of the regularization on the qualit
 		Predictive          & 100  & 0 & 0 & 0.052 & 0.614 & 0.738 & 57.46 \\
 		Denoising           & 0    & 0.0005 & 0 & 0.078 & 0.648 & 0.750 & 61.84 \\
 		Distance            & 0    & 0 & 50 & 0.063 & 0.623 & 0.739 & 59.62 \\
-    Denoising and distance& 100 & 0 & 50 & 0.532 & 0.865 & 0.886 & 64.05 \\
+    Predictive and distance& 100 & 0 & 50 & 0.532 & 0.865 & 0.886 & 64.05 \\
 		all   & 100 & 0.0005 & 50 & & & &													\\ \hline
     \end{tabular}
 \end{center}
@@ -207,8 +207,8 @@ In this subsection we try to analyze effects of the regularization on the qualit
 	\subfigure[Embedding with a CNN AE.]{
 		\includegraphics[width=.45\textwidth]{cmp3/cnn4_2.png}
 	}\\
-    	\caption{Embedding a closed self-intersecting trajectory $(a)$ in a lower dimensional space using CNN AE. Black arrows on the reference trajectory indicate the direction of the player's view.}
-    	\label{fig:model_reco}
+    	\caption{Embedding a closed self-intersecting trajectory $(a)$ in a lower dimensional space using CNN AE. Black arrows on the reference trajectory indicate the direction of the player's view. Each embedding frame is visualized as time-colored point, subsequent frames are connected by a black line.}
+    	\label{fig:model_param}
 \end{figure}
 
 
@@ -239,6 +239,20 @@ Data collection method quarantines, that while train and validation trajectories
   \caption{Validation performance of different model configurations on a large training set with multiple degrees of freedom.}
   \label{tab:large}
 \end{table}
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[Trivial \textit{eight} trajectory as on figure \ref{fig:model_reco}(a) ]{
+  \includegraphics[width=.45\textwidth]{cmp4/cnn8.png}
+	}
+	\subfigure[Closed self-intersecting trajectory as on figure \ref{fig:model_param}(a)]{
+		\includegraphics[width=.45\textwidth]{cmp4/cnn82.png}
+	}\\
+    	\caption{Visualization of first 3 components of 8 dimensional embedding of a validation closed self-intersecting trajectories mixed CNN-FC AE.}
+    	\label{fig:model_big}
+\end{figure}
+
+Visual inspection of the embedding even without using dimensionality reduction techniques, showed that trajectory prototype maintains the characteristics actual players path. Namely it intersects itself only in a single place and the time of intersection corresponds to the time of the actual intersection of the trajectory. Yet, the path prototype appear entangled and relatively noisy comparing to previous experiments.
 
 
 
