@@ -23,7 +23,7 @@ Doom is a first-person shooter (FPS) computer game utilizing 3D graphics.
 In context of our research the ViZDoom platform allows automatic visual data generation and collection.
 Example of the output image is shown on figure \ref{fig:doom}.
 
-We created multiple Doom maps specifically for our task using the Slade \cite{Slade3} software.
+We created multiple \texttt{Doom II} maps specifically for our task using the Slade \cite{Slade3} software.
 Created maps provide high diversity of textures for better discrimination between images, captured from different positions on the map.
 Other reason for diverse structures on the map is to explicitly brake symmetry of the map.
 Symmetric maps look alike from different player positions which leads to entangled manifolds in feature space.
@@ -38,7 +38,7 @@ In addition to that, we record movement along well defined structured trajectori
 \begin{figure}
 \centering
 \includegraphics[width=.80\textwidth]{doom.png} %{CS0031}
-\caption{Example of DoomII image collected with ViZDoom \cite{Kempka2016}.}
+\caption{Example of \texttt{Doom II} image collected with ViZDoom \cite{Kempka2016}.}
 \label{fig:doom}
 \end{figure}
 
@@ -65,7 +65,7 @@ Furthermore, we introduce multiple complexity levels of movement across trajecto
 We collect RGBD images from the 3D engine. Each image has resolution of 160 by 120 pixels. Each pixel is describe by 3 color channels and a single distance channel. Each channel can take a discrete value between 0 and 255 including. This format results in 76800 dimensional inputs.
 
 
-\section{Predictive evaluation}
+\section{Predictive evaluation} \label{ss:score}
 
 Evaluation of the performance of unsupervised models is inherently difficult.
 Discriminative models typically use well-defined metrics with clear quantifiable outputs, as classification accuracy, F-measure etc. Unsupervised models generally have no access to such metrics.
@@ -75,62 +75,175 @@ Other models rely on the primary learning objective, which is not necessarily re
 In context of this work we would like to have access to a concise measure for comparison of model designs.
 Primary objective of an autoencoder -- good reconstruction of the input image -- is not very descriptive, since it makes no assumption about the spatial characteristics of the extracted features. Nevertheless, we provide our reconstruction loss values with the experiments.
 
-We are going to use \textit{predictive evaluation} as a main mean of model comparison from perspective of spatial feature extraction. With the predictive objective we would like to evaluate the quality of extracted spatial features. We do that by considering local resemblance of the manifold to an euclidean space. But, since we are working with unlabeled data another assumption is required. Namely, for any trajectory of actors movement we expect, that the best approximation of the transition between current and next step to be equivalent to the transition between previous and current step (when only last two frames are available for performing the prediction). We, therefore try to predict spatial position of the player on the next step on the manifold calculating it as $\hat{x}_{t+1} = x_t + (x_t- x_{t-1})$. Figure \ref{fig:m_pred} illustrates the process.
+We are going to use \textit{predictive score} as a main mean of model comparison from perspective of spatial feature extraction. With the predictive objective we would like to evaluate the quality of extracted spatial features. We do that by considering local resemblance of the manifold to an euclidean space. But, since we are working with unlabeled data another assumption is required. Namely, for any trajectory of actors movement we expect, that the best approximation of the transition between current and next step to be equivalent to the transition between previous and current step (when only last two frames are available for performing the prediction). We, therefore try to predict spatial position of the player on the next step on the manifold calculating it as $\hat{x}_{t+1} = x_t + (x_t- x_{t-1})$. Figure \ref{fig:m_pred} illustrates the process.
 Since different models have different deformations of manifold space and, therefore, might differ in terms of absolute values of the $L_2$ loss between predicted and actual location $L_2(\hat{x}_{t+1}, x_{t+1})$, we use relative improvement as a reference. We compare the improvement of prediction over a naive prediction $\tilde{x}_{t+1} = x_t$. We therefore define predictive metric as follows:
 \begin{equation}
-  P_{L2} = \frac{1}{N-2}\sum^{N-1}_{i=2}{L_2(\hat{x}_{i+1}, x_{i+1})} - {L_2(x_i, x_{i+1})}
+  \begin{aligned}
+  &P_{L2}(X) = \frac{1}{N-2}\sum^{N-1}_{i=2}{f(L_2(\hat{x}_{i+1}, x_{i+1})}, {L_2(x_i, x_{i+1}))}\\
+  &f(x, y) = max(0, \frac{y-x}{y}) \text{ note: } f(x, y) \in [0, 1]
+  \end{aligned}
 \end{equation}
-, where $N$ is a number of inputs in the validation set. Prediction is possible only for elements starting from the 3rd, therefore first two images do not contribute to the metric.
+where $N$ is a number of inputs in the validation set. Note, that $P_{L2}(X) \in [0, 1]$ and 1.0 indicates perfect prediction of the next frame at each moment in time; 0.0 average prediction to be worse than naive prediction. Prediction is possible only for elements starting from the 3rd, therefore first two images do not contribute to the score.
 
-Note, that similar technique is used as a model regularization. Yet, predictive regularization is applied as a reconstruction error and does not have direct effect on the predictive metric. For example, an decoder of large enough capacity can have very low reconstruction error of both actual encoding $x_{t+1}$ and predictive encoding $\hat{x}_{t+1}$, but low score of predictive evaluation. This can happen when two prototypes in the embedding space $x_{t+1}$ and $\hat{x}_{t+1}$ have distinct difference, but are still reconstructed as alike images. This case can be explained by overfitting in the decoder network.
+Note, that similar technique is used as a model regularization. Yet, predictive regularization is applied as a reconstruction error and does not have direct effect on the predictive score. For example, an decoder of large enough capacity can have very low reconstruction error of both actual encoding $x_{t+1}$ and predictive encoding $\hat{x}_{t+1}$, but low score of predictive evaluation. This can happen when two prototypes in the embedding space $x_{t+1}$ and $\hat{x}_{t+1}$ have distinct difference, but are still reconstructed as alike images. This case can be explained by overfitting in the decoder network.
 
-To counter high sensitivity of the $L_2$ error function to outliers we also calculate another flavor of the described metric: \textit{binary predictive evaluation}. The total $L_2$ loss value on the complete validation set can increase sharply with presence of a few outliers. In this case, while overall quality of the manifold might have desired properties for majority of the inputs, it can still produce very high error during the validation. This can happen since $L_2$ error does not take into account varying density of the manifold. To counter that, we introduce a similar simplified version of predictive metric, namely producing its binary form. Binary predictive metric simply compares the distance between \textit{naive prediction} (current frame) and the prediction calculate as above to the actual point.
+To counter high sensitivity of the $L_2$ error function to outliers we also calculate another flavor of the described evaluation: \textit{binary predictive score}. The total $L_2$ loss value on the complete validation set can increase sharply with presence of outliers. In this case, while overall quality of the manifold might have desired properties for majority of the inputs, it can still produce high validation error. This can happen since $L_2$ error does not take into account varying density of the manifold. To counter that, we introduce a similar simplified version of predictive score, namely producing its binary form. Binary predictive score simply compares the distance between \textit{naive prediction} naive and estimate of the future frame and the prediction calculated by the previous 2 frames.
 
+\begin{equation}
+  \begin{aligned}
+  & P_{NN}(X) = \frac{1}{N-2}\sum^{N-1}_{i=2}{g  \big( L_2(\hat{x}_{i+1}, x_{i+1})} - {L_2(x_i, x_{i+1}) \big) },\\
+  & g(x) = \begin{cases} 1, & \mbox{if } x > 0 \\ 0, & \mbox{if } x \leq 0 \end{cases}
+\end{aligned}
+\end{equation}
+ Value of $P_{L2}(X)$ belongs to interval $[0, 1]$ and 1.0 indicates that calculated prediction for each point was better than naive prediction; 0.0 indicates that no predicted value was better than naive prediction. Perfect score might not be achievable even for some trajectories.
 
 \subsection{Preserving nearest neighbor relation}
 
 Another key characteristic of the desired encoding function is high interpretability of the feature manifold.
+Interpretability itself is a loosely defined characteristic. Yet, we propose an evaluation score, that should asses some features of an interpretable spatial manifold. Namely, we argue, that less entangled manifold provide grater interpretability and are more visually appealing. As a proxy measure of such quality we propose exploring nearest-neighbor relation in the input data. We expect, that on a smooth and dense manifold subsequent video frames will be closer to each other than to more remote frames. We therefore can measure, how many subsequent frames remain nearest neighbor in the manifold space. We expect such a characteristic degrade with more entangled and less smooth manifolds.
 
+
+
+\begin{equation}
+  \begin{aligned}
+  & P_{\tau}(X) = \frac{1}{N-2}\sum^{N-1}_{i=2}{\tau  \big(i, m_i, n_i) },\\
+  & \tau(i, m, n) =
+\begin{cases}
+  1, & \mbox{if } (i-1) \in \{m, n\}  \mbox{ and }  (i+1) \in \{m, n\}  \\
+  0, & \mbox{if } (i-1) \notin \{m, n\}  \mbox{ and }  (i+1) \notin \{m, n\} \\
+  0.5, & \mbox{otherwise }
+\end{cases}
+\end{aligned}
+\end{equation}
+where $m_i, n_i$ are indexes of top-2 nearest neighbors of element $i$.  $P_{\tau}(X)$ can take values in interval $[0, 1]$ and 1.0 means that every nearest frame at every time stamp $i$ is the nearest neighbor of the current frame in the embedding space. Value 1.0 might not be achievable, depending on the trajectory.
 
 
 \section{Model comparison}
 
+In this section we evaluate proposed models. We analyze qualities of the different models in terms of our evaluation scores. We compare performance on datasets of various complexities and analyze sensitivity to different kinds of regularizations.
+
 \subsection{Backbone model comparison}
+
+As a first experiment we would like to asses model behavior on a simple concept, that can be easily understood visually. For that purpose we stick low dimensional encoding in percept able 3D space. This limitation leaves us in the domain of low-complexity trajectories, that depend only on few components. Since one degree of freedom - vertical movement of players view during horizontal motion - is taken, we choose a dataset that explores only 2 degrees of freedom. We also choose a simplest type of trajectory to observe behavior on a trivial task.
+
+First experiment is performed on a closed trajectory with intersections 'eight' that allows only movements along the axis. Player always faces the same direction, therefore we can expect components, describing direction of the view to remain fixed. Following the trajectory player makes several steps along the already visited path (see figure \ref{fig:model_reco}$(a)$). In total, dataset contain 13680 sequential images that corresponds to 3 passes along the trajectory. With this trajectory would like to asses next qualities of the embedding space:
+\begin{enumerate}
+  \item tractable continuous changes in the embedding over time;
+  \item presence or absence of key elements of the trajectory: direction changes;
+  \item existence of intersections and coherence of the intersections to the actual trajectory;
+  \item visual recognizability of the trajectory in the embedding.
+\end{enumerate}
+
+Results of the experiments for 3 backbone models are shown on figure \ref{fig:model_reco}. Metrics of section \label{fig:model_reco} are calculated and mentioned in table \ref{tab:3demb}.
+
 
 \begin{table}
 \begin{center}
-    \begin{tabular}{| l | l | l | l |}
+    \begin{tabular}{| l | l | l | l | l |}
     \hline
-    Model  & Predictive & Reconstruction & 009 \\ \hline
-    FC	   & 0.082 	    & 0.204	         & 615 \\ \hline
-    CNN 	 & 0.116 	    & 0.271 	       & 549 \\ \hline
-    WW 	   & 0.287 	    & 0.429 	       & 221 \\ \hline
+    Model  &  $P_{L2}$    &  $P_{\beta}$     &  $P_{\tau}$ &  $L_{reco}$ \\ \hline
+    Fully Connected	 AE  & 0.498 & 0.728 & 0.750 & 54.40        \\
+    CNN AE 	 & 0.374 & 0.632 & 0.780 & 49.60        \\
+    What-Where AE 	   & 0.000 & 0.403 & 0.623 & 1.50         \\ \hline
     \end{tabular}
 \end{center}
-  \caption{Predicted and actual result of kernel approximation on synthetic dataset}
-  \label{tab:kernel}
+  \caption{Comparison of 3 backbone architecture performance on an artificial low-complexity trajectory. Scores   $P_{L2}$, $P_{\beta}$, $P_{\tau}$ are described in section \ref{ss:score} (higher is better). Reconstruction error $L_{reco}$ indicates quality of the image produced by the autoencoder (lower is better).}
+  \label{tab:3demb}
 \end{table}
 
+\begin{figure}[t!]
+	\centering
+	\subfigure[Reference \textit{trivial} trajectory]{
+  \includegraphics[width=.45\textwidth]{cmp2/tr1.png}
+	}
+	\subfigure[Embedding with a Fully connected AE.]{
+		\includegraphics[width=.45\textwidth]{cmp2/fc_3.png}
+	}\\
+	\subfigure[Embedding with a Convolutions AE.]{
+    	\includegraphics[width=.45\textwidth]{cmp2/cnn_3.png}
+	}
+	\subfigure[Embedding with the What-Where AE.]{
+    \includegraphics[width=.45\textwidth]{cmp2/ww_3.png}
+	}
+    	\caption{Embedding a trivial closed self-intersecting trajectory $(a)$ with 2 degrees of freedom using reference models $(b, c, d)$ in a 3-dimensional space. Subsequent frames of the input image sequence are encoded in similar colors to indicate temporal relation between visually disconnected discrete inputs in the embedding space. Color is consistent among the models and corresponds to same points of the trajectory.}
+    	\label{fig:model_reco}
+\end{figure}
 
-\subsection{Regularization}
+From perspective of the metrics described in section \ref{ss:score} models distinguish sharply. What-Where AE model, while yielding best reconstructions, produced lowest quality embedding space. Average prediction were of a worth quality than using current position as an estimator and only 40\% of the predictions were closer to the actual position of the next frame than current frame. All models were able to maintain more than 63\% of nearest neighbor relations between frames with Convolutional model showing slightly better results than others. Fully connected model produced embedding of the highest predictive power, showing best predictive scores $P_{L2}, P_{\beta}$.
+
+Visual harassment of the embedded trajectories \label{fig:model_reco} shows, that all models were able to preserve somewhat continuous form of the trajectory. All models were able to maintain model elements as intersection and direction changes in some form. Comparing embedding spaces we can see, that embedding produces by What-Where AE falls behind the other models. This observation is coherent with numerical scores calculated above. What-Where AE were able to produce the least complex manifold structure among 3 models. Yet, we are going to ignore this model in future experiments, since with higher dimensional and more complex concepts performance drops sharply and visual assessment is not longer possible without using specialized visualization techniques.
+
+Convolutional model produced the most visually pleasing results. It falls behind the fully-connected model in terms of the synthetic scores, but saw steady improvement with the increase of network capacity (namely, increased size of the feature maps in the layers) and were only limited by our computational resources. Convolutional model was able maintain visually parallel lines of the input trajectory and maintain larger distance between parts of the trajectory. Fully convolutional model appears to spread the trajectory embedding along the surface of the embedding space.
+
+\subsection{Effects of regularization}
+
+In this subsection we try to analyze effects of the regularization on the qualities of the extracted manifold. This time we use a more complex trajectory. Since visual assessment is not a goal of this experiment, we can safely use higher dimensional embedding space. For this experiment we use a natural closed trajectory with single intersection "eight" where player always faces the direction of the movement. This trajectory corresponds to a more natural type of players movement and involves more complex between-frame transformations caused by changing the direction of the view.
+
+\begin{table}
+\begin{center}
+    \begin{tabular}{| l | l | l | l | l | l | l | l |}
+    \hline
+    \multirow{2}{*}{Regularization}      &\multicolumn{3}{|c|}{Parameters} & \multicolumn{4}{|c|}{Scores}  \\   \cline{2-8}
+
+     & $\alpha$ & $\beta$ & $\gamma$    &  $P_{L2}$ & $P_{\beta}$ & $P_{\tau}$ & $L_{reco}$ \\ \hline
+
+		No regularization 	& 0    & 0 & 0 & 0.000 & 0.418 & 0.617 & 60.64 \\
+		Predictive          & 100  & 0 & 0 & 0.052 & 0.614 & 0.738 & 57.46 \\
+		Denoising           & 0    & 0.0005 & 0 & 0.078 & 0.648 & 0.750 & 61.84 \\
+		Distance            & 0    & 0 & 50 & 0.063 & 0.623 & 0.739 & 59.62 \\
+    Denoising and distance& 100 & 0 & 50 & 0.532 & 0.865 & 0.886 & 64.05 \\
+		all   & 100 & 0.0005 & 50 & & & &													\\ \hline
+    \end{tabular}
+\end{center}
+  \caption{Regularization effects.}
+  \label{tab:8emb}
+\end{table}
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[Reference \textit{eight} trajectory]{
+  \includegraphics[width=.45\textwidth]{cmp3/tr2.png}
+	}
+	\subfigure[Embedding with a CNN AE.]{
+		\includegraphics[width=.45\textwidth]{cmp3/cnn4_2.png}
+	}\\
+    	\caption{Embedding a closed self-intersecting trajectory $(a)$ in a lower dimensional space using CNN AE. Black arrows on the reference trajectory indicate the direction of the player's view.}
+    	\label{fig:model_reco}
+\end{figure}
+
+
+We tested our training method on 8 possible configurations of the regularization. Best values of the error weight were selected with a grid search and has been fixed throughout the training. Model without any regularization showed
+
+Higher regularization leads to higher $P_{\tau}$ score while decreasing reconstruction quality
 
 
 \subsection{Dataset complexity}
 
+In this section we test our low-dimensionality embedding method on a large realistic dataset. We further evaluate test model on a trajectory which is not present in the training set, although recorded on the same map. We use a long continuous trajectory on a single \texttt{Doom II} map containing 300000 training images.
+As validation we use a "circle" and an "eight" continuous trajectory similar to one described in previous experiment.
+Data collection method quarantines, that while train and validation trajectories might contain similar or identical images, this images do not appear in duplicated subsequences i.e. if $t_i = v_j$ than $t_{i+1} \neq v_{j+1}$ for $\forall i \leq |T|$, where $T, V$ are validation and training sets. This constrain allows us to state, that even if continuity of training trajectory is imposed explicitly by the predictive regularization and only indicates overfitting, validation data shall not have the same quality.
+
+\begin{table}
+\begin{center}
+    \begin{tabular}{| l | l | l | l | l |}
+      \hline
+     Model configuration  &  $P_{L2}$ & $P_{\beta}$ & $P_{\tau}$ & $L_{reco}$ \\ \hline
+     16c3s2-32c3s2-32c3s2-16c3-f3     & 0.000 & 0.222 & 0.356 & 69.98 \\
+     16c3s2-32c3s2-32c3s2-16c3-f100-f3 & 0.000 & 0.246 & 0.376 & 66.72 \\
+     16c3s2-32c3s2-32c3s2-16c3-f250-f3 & 0.000 & 0.249 & 0.387 & 66.72 \\
+     16c3s2-32c3s2-32c3s2-16c3-f250-f4 & 0.000 & 0.225 & 0.474 & 65.08 \\
+     16c3s2-32c3s2-32c3s2-16c3-f8      & 0.000 & 0.091 & 0.588 & 64.30 \\
+     16c3s2-32c3s2-32c3s2-16c3-f80-f8  & 0.000 & 0.149 & 0.587 & 57.09 \\ \hline
+    \end{tabular}
+\end{center}
+  \caption{Validation performance of different model configurations on a large training set with multiple degrees of freedom.}
+  \label{tab:large}
+\end{table}
+
+
+
+
+\subsection{Dimensionality of the embedding space}
+
 
 \subsection{Relevance of depth information}
-
-
-
-
-\section{Loop closure detection}
-
-Compare to \cite{Xia2016} on Freiburg2 dataset for loop closure detection.
-
-\section{Manifold construction}
-
-Compare to \cite{Jaderberg2015} in terms of how valuable the representation comparing to their results.
-
-\section{Topology reconstruction}
-
-Shall be removed(
