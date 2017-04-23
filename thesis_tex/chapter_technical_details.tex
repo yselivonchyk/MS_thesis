@@ -183,6 +183,14 @@ Subset of inputs selected this way are called \textbf{mini-batches}. Updated alg
 
 \subsubsection{Backpropagation algorithm}
 
+In context of feed-forward neural networks we can view each layer as an independent function, taking output of the previous layer as an input:
+\begin{equation}
+  y_i = f_i(y_{i-1}) | i \in [0, N]
+\end{equation}
+where $N$ is a number of layers of the network and $y_0=X$ and $y_N$ is the output of the complete network.
+
+The recurrent procedure of calculating the intermediate states $y_i$ is called \textit{forward pass} through the network. Likewise, gradient calculation can be done in the same recurrent manner starting from the output layer backwards. Later procedure of layer-wise weight update is typically referred to as \textit{backwards pass} and this specific version of gradient-descent algorithm is called \textit{backpropagation algorithm}.
+
 \subsubsection{Adam update rule}
 
 Training time of gradient descent based algorithms can be reduced by applying adaptive learning rates \cite{Kingma2015}.
@@ -222,7 +230,8 @@ The algorithm requires memory overhead proportional to the number of parameters 
 
 \subsection{Regularization}
 
-\subsubsection{Bagging}
+High capacity of the model can lead to training data overfitting. This results in sharp differences in performance on the training and yet unseen data. This creates a necessity to use a separate \textit{test} set of data for scoring model's performance. Test set is not used in for training. Additionally, the overfitting requires additional regularization techniques to narrow the gap between model performance on the training and yet unseen data.
+
 \subsubsection{Dropout}
 
 Applying an ensemble of models guarantees to perform not worse than any of ensemble members but the computational complexity of the training and evaluation grows linearly with the size of the ensemble. This might play a limiting factor on the size of the ensemble, especially when training of even a single model is computationally expensive.
@@ -410,9 +419,6 @@ Unpooling layers contain no parameters and are not affected by backpropagation.
 
 It's worth noting, that mask information extracted by a modified pooling layer depends on the order of feature channels. As stated by the authors of the original idea, this might have an effect on features, extracted by layers preceding unpooling \cite{Zhao2015}.
 
-\subsubsection{What-Where autoencoders}
-
-
 
 \subsection{Extracting useful features with Autoencoders}\label{ch:mod_ae}
 
@@ -451,7 +457,7 @@ Sparse coding of the data has proven to be useful to solve the classification pr
 In particular, the classification task requires us to assign one of $C$ exclusive classes we can train an autoencoder with $C$ hidden units. Once training converges we expect that features, learned by the hidden layer would somewhat correspond to classes of tasks. We can then use the encoder part of the network as initialization of a classifier of the same architecture \cite{Masci2011}.
 Such initialization leads to consistently better generalization results after supervised training of the classifier.
 
-\subsubsection{Variational Autoencoders}\label{ch:vae}
+% \subsubsection{Variational Autoencoders}\label{ch:vae}
 
 
 

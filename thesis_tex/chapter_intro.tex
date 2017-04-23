@@ -23,18 +23,30 @@
 % VLAD-Based Loop Closure Detection For Monocular SLAM \cite{Xia2016, Gao2015a, Huang2016}
 
 Localization tasks represent a significant challenge in artificial intelligence (AI).
-In particular, successful localization is extremely important to such AI areas as robotics, self-driving vehicles, and micro-surgery, to name a few \cite{Wang2017, Mountney2006}.
-It has many potential applications in simultaneous localization and mapping (SLAM) \cite{Cadena2015, Zikos2016}, loop closure detection \cite{Xia2016, Gao2015a, Huang2016}, and correspondence learning \cite{Boscaini2016}.
-These tasks are normally trained with labeled data, which is often limited and difficult to collect.
-Meanwhile, recent successes in reinforcement learning \cite{Silver, Lample2016} has shown, that given access to powerful models and abundant amount of training data, learning can be done in loosely supervised way.
-Important aspect of such training is availability of gaming engines, that can create large amounts of training data on the go.
-We are going to take advantage of these developments, by reusing these data generation techniques for learning localization from unlabeled data.
+In particular, localization is extremely important to such AI areas as robotics, self-driving vehicles, and micro-surgery, to name a few \cite{Wang2017, Mountney2006}.
+Such tasks as simultaneous localization and mapping (SLAM) \cite{Cadena2015, Zikos2016}, loop closure detection \cite{Xia2016, Gao2015a, Huang2016}, and correspondence learning \cite{Boscaini2016} try to solve some form of localization problem.
 
-We expect localization task to be possible to learn in an unsupervised manner.
-For a given static environment (say, a room or a map of a computer game) we can exactly describe the view of an actor (player, person) by its current position and the direction of the view.
-This allows us to state, that every single image observed by the actor can be unambiguous encoded by a small set of latent variables.
-Furthermore, from a continuous nature of actors movement we can expect these variables to form a dense continuous manifold in some space of latent variables.
-Given that such a manifold exists, we try to construct it in an unsupervised way with a deep neural network model.
+We can generally define localization as a task of extracting, tracking or predicting object's position in some environment from available sensory data. As, for example, for self-driving vehicles it might be important to track and predict relative position of the pedestrians within the field of view from visual RGBD data \cite{Dollar2009}. Same kind of data can be used to extract positions and dimensions of the objects, manipulated by automated-robots \cite{Hernandez2016}. This tasks are typically trained from the labeled data, which is difficult to collect.
+
+In this work we are going to focus on unsupervised localization in artificial environments such as computer games. Recent successes in the reinforcement learning \cite{Silver, Lample2016} has proven, that given access to computational recourses and sufficient amounts of training data, even ill-defined machine-learning problems can be solved with high quality (comparable to human) results. In this work we would like to take advantage of the data-generation techniques, created for reinforcement learning \cite{Brockman2016, Kempka2016}, in order to try to solve localization problem in an unsupervised way. More specifically, we are going to use 3D engine of a first-person shooter (FPS) computer game \texttt{Doom II} in order to generate sufficient amount visual data for training.
+
+We propose an model that extracts positional information of the player from the current view.
+Visual data is typically high dimensional and each image might contain tens of thousands of features. Meanwhile, we know, that current view can be compactly and unambiguously described by the current position of the player and the direction of the view. Therefore, we can view the position and the direction of the view as low-dimensional latent representation of high-dimensional visual data. Furthermore, continuous nature of these latent features allows us to state, that there exists a low-dimensional manifold, on which all players movement maintain the continuous nature. We, therefore, try to build a deep-learning model for extracting such manifold from the visual data.
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[Example video data, recorded from the first person view of a player in the shooter game  \texttt{Doom II}.]{
+  \includegraphics[width=.99\textwidth]{sprite2_2.png}
+	}\\
+	\subfigure[Example 3-dimensional embedding produced by the model.]{
+    	\includegraphics[width=.45\textwidth]{cmp2/cnn_3.png}
+	}
+	\subfigure[Visualization of the actual player's path.]{
+    \includegraphics[width=.45\textwidth]{path.png}
+	}
+    	\caption{Visualization of spatial information extraction from video signal by unsupervised autoencoder based model. Model takes sequence of RGBD images as an input (top), observed by the actor while walking along some path. Model projects each frame into a lower dimensional space in order to extract information, relevant to the position of the player (bottom left). Sequential frames are displayed in similar colors. Bottom-left picture schematically draws actual trajectory of the player.}
+    	\label{fig:model_reco}
+\end{figure}
 
 Several models has been successfully applied to unlabeled data allowing to construct a dense manifold representation of some visual concepts \cite{Li2015, Kingma2013, Goodfellow2014}.
 While these techniques succeeded in encoding data in a lower dimensional space of independent features, they make no assumption about the nature of these features.

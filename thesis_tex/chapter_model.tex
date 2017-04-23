@@ -139,10 +139,25 @@ Fully connected layers rely on huge number of parameters comparing to convolutio
 Number of parameters grows fast with increase in number of layers or number of output units.
 This growth of complexity in the parameter space can lead to over-fitting in form of identity learning by the network.
 
-A typical design of an autoencoder network is described by table ?? and depicted on figure ??.
+A typical design of an autoencoder network is described by table \ref{tab:nets} and depicted on figure \ref{fig:tf_graph_1}
 % TODO: add table and figure reference
 
-\subsection{Convolutional autoencoder}
+\begin{table}
+\begin{center}
+    \begin{tabular}{| p{28mm} | p{35mm} | p{35mm} | p{35mm} |}
+      \hline
+       Model & Fully-Connected AE & Convolutional AE & What-Where AE \\ \hline
+     Encoder layers		& 0.135 & 0.498 & 0.676 \\ \hline
+     Bottleneck \newline (embedding) \newline layer & 0.135 & 0.498 & 0.676 \\ \hline
+     Decoder layers		& 0.135 & 0.498 & 0.676 \\ \hline
+    \end{tabular}
+\end{center}
+  \caption{Configuration description of 3 main network architectures.}
+  \label{tab:nets}
+\end{table}
+
+
+\subsection{Convolutional autoencoder} \label{ss:cnnaec}
 
 The largest successes of deep learning in computer vision in recent years are attributed to convolutional models like AlexNet or Inception \cite{Krizhevsky2012, Szegedy2016}.
 Convolutional models provide significant advantage by drastically reducing number of model parameters through parameter sharing.
@@ -155,7 +170,7 @@ Several autoencoder models has been successfully applied to image data in both s
 We follow a common practice by using ReLU as activation function (see figure \ref{fig:act}).
 We also use only $3 \times 3$ convolutional kernels as the most computationally effective \cite{Szegedy2016a}.
 
-\subsection{WhatWhere autoencoder}
+\subsection{What-Where autoencoder}
 
 Architecture of What-Where autoencoders \cite{Zhao2015} propose using additional information flow between encode and decoder to improve the quality of the reconstruction.
 What-where autoencoders store the positions of maximum-elements during max-pooling operation to reuse it during reconstruction.

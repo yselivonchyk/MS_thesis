@@ -177,7 +177,7 @@ Convolutional model produced the most visually pleasing results. It falls behind
 
 \subsection{Effects of regularization}
 
-In this subsection we try to analyze effects of the regularization on the qualities of the extracted manifold. This time we use a more complex trajectory. Since visual assessment is not a goal of this experiment, we can safely use higher dimensional embedding space. For this experiment we use a natural closed trajectory with single intersection "eight" where player always faces the direction of the movement. This trajectory corresponds to a more natural type of players movement and involves more complex between-frame transformations caused by changing the direction of the view.
+In this subsection we try to analyze effects of the regularization on the qualities of the extracted manifold. This time we use a more complex trajectory. Since visual assessment is not a goal of this experiment, we can safely use higher dimensional embedding space. For this experiment we use a natural closed trajectory with single intersection "eight" where player always faces the direction of the movement. This trajectory corresponds to a more natural type of players movement and involves more complex between-frame transformations caused by changing the direction of the view. Sample of the trajectory and regularization are shown on figure \ref{fig:model_param}.
 
 \begin{table}
 \begin{center}
@@ -187,12 +187,14 @@ In this subsection we try to analyze effects of the regularization on the qualit
 
      & $\alpha$ & $\beta$ & $\gamma$    &  $P_{L2}$ & $P_{\beta}$ & $P_{\tau}$ & $L_{reco}$ \\ \hline
 
-		No regularization 	& 0    & 0 & 0 & 0.000 & 0.418 & 0.617 & 60.64 \\
-		Predictive          & 100  & 0 & 0 & 0.052 & 0.614 & 0.738 & 57.46 \\
+		No regularization 	& 0    & 0 & 0 & 0.000 & 0.418 & 0.617 & 60.64 \\ \hline
+		Predictive          & 100  & 0 & 0 & 0.052 & 0.614 & 0.738 &  \textbf{57.46} \\
 		Denoising           & 0    & 0.0005 & 0 & 0.078 & 0.648 & 0.750 & 61.84 \\
-		Distance            & 0    & 0 & 50 & 0.063 & 0.623 & 0.739 & 59.62 \\
-    Predictive and distance& 100 & 0 & 50 & 0.532 & 0.865 & 0.886 & 64.05 \\
-		all   & 100 & 0.0005 & 50 & & & &													\\ \hline
+		Distance            & 0    & 0 & 50 & 0.063 & 0.623 & 0.739 & 59.62 \\ \hline
+    Predictive and denoising 	& 100    & 0.0005 & 0 & 0.069 & 0.653 & 0.751 & 61.57 \\
+    Predictive and distance  & 100    & 0 & 50 & \textbf{0.591} & \textbf{0.909} & \textbf{0.912} & 61.19 \\
+    Denoising and distance  & 0    & 0.0005 & 50 & 0.081 & 0.649 & 0.758 & 60.16 \\ \hline
+    All 3 & 100    & 0.0005 & 50 & \textbf{0.591} & 0.905 & 0.911 & 62.04 \\ \hline
     \end{tabular}
 \end{center}
   \caption{Regularization effects.}
@@ -201,40 +203,50 @@ In this subsection we try to analyze effects of the regularization on the qualit
 
 \begin{figure}[t!]
 	\centering
+
 	\subfigure[Reference \textit{eight} trajectory]{
   \includegraphics[width=.45\textwidth]{cmp3/tr2.png}
 	}
 	\subfigure[Embedding with a CNN AE.]{
 		\includegraphics[width=.45\textwidth]{cmp3/cnn4_2.png}
 	}\\
-    	\caption{Embedding a closed self-intersecting trajectory $(a)$ in a lower dimensional space using CNN AE. Black arrows on the reference trajectory indicate the direction of the player's view. Each embedding frame is visualized as time-colored point, subsequent frames are connected by a black line.}
+  \subfigure[Frames from the \textit{Eight} self-intersection trajectory.]{
+    \includegraphics[width=.90\textwidth]{sprite2.png}
+  }\\
+    	\caption{Embedding a closed self-intersecting trajectory $(a, c)$ in a lower dimensional space using CNN AE. Black arrows on the reference trajectory indicate the direction of the player's view. Each embedding frame is visualized as time-colored point, subsequent frames are connected by a black line.}
     	\label{fig:model_param}
 \end{figure}
 
+Our experiments revealed, that models, based on a fully connected configuration show either similar or worth results comparing to CNN for more complex datasets while following the same trends as below. We therefore only provide results for better performing convolutional models.
 
 We tested our training method on 8 possible configurations of the regularization. Best values of the error weight were selected with a grid search and has been fixed throughout the training. Model without any regularization showed
+no improvement according to the predictive metric and binary predictive metric is well below 50\%. Yet, model was able to preserve 61.7\% of nearest neighbor relations.
 
-Higher regularization leads to higher $P_{\tau}$ score while decreasing reconstruction quality
+When using a single type of regularization all 3 methods showed comparable results. Using a single regularization allows 5 to 8\% more accurate prediction of the next position on the manifold. Prediction of the future frame was more accurate than naive prediction in around 61-65\% of the time. In terms of reconstruction quality predictive regularization allowed to archive significant improvement over the non-regularized model. Interestingly, applied alone, denoising regularization showed the best results among the 3.
+
+Among 3 models utilizing 2 types of regularization all showed at least marginal improvement over models with single regularization technique with "Predictive and distance" regularized model sharply outperforming all the others. "Predictive and distance" showed 59\% improvement in accuracy of future position prediction with 91\% of predictions being more accurate than naive prediction. It also managed to maintain 91\% of nearest neighbor relations in the embedding space.Reconstruction accuracy decreased.
+
+Adding Denoising regularization to the best model so far did not have any significant effect as shown in the last line of the table \ref{tab:8emb}. We therefore take the combination of predictive and distance regularization as the main configuration of the model.
 
 
 \subsection{Dataset complexity}
 
 In this section we test our low-dimensionality embedding method on a large realistic dataset. We further evaluate test model on a trajectory which is not present in the training set, although recorded on the same map. We use a long continuous trajectory on a single \texttt{Doom II} map containing 300000 training images.
 As validation we use a "circle" and an "eight" continuous trajectory similar to one described in previous experiment.
-Data collection method quarantines, that while train and validation trajectories might contain similar or identical images, this images do not appear in duplicated subsequences i.e. if $t_i = v_j$ than $t_{i+1} \neq v_{j+1}$ for $\forall i \leq |T|$, where $T, V$ are validation and training sets. This constrain allows us to state, that even if continuity of training trajectory is imposed explicitly by the predictive regularization and only indicates overfitting, validation data shall not have the same quality.
+Data collection method guaranties, that while train and validation trajectories might contain similar or identical images, this images do not appear in duplicated subsequences i.e. if $t_i = v_j$ than $t_{i+1} \neq v_{j+1}$ for $\forall i \leq |T|$, where $T, V$ are validation and training sets. This constrain allows us to state, that even if continuity of training trajectory is imposed explicitly by the predictive regularization and only indicates overfitting, validation data shall not have the same quality.
 
 \begin{table}
 \begin{center}
     \begin{tabular}{| l | l | l | l | l |}
       \hline
      Model configuration  &  $P_{L2}$ & $P_{\beta}$ & $P_{\tau}$ & $L_{reco}$ \\ \hline
-     16c3s2-32c3s2-32c3s2-16c3-f3     & 0.000 & 0.222 & 0.356 & 69.98 \\
-     16c3s2-32c3s2-32c3s2-16c3-f100-f3 & 0.000 & 0.246 & 0.376 & 66.72 \\
-     16c3s2-32c3s2-32c3s2-16c3-f250-f3 & 0.000 & 0.249 & 0.387 & 66.72 \\
-     16c3s2-32c3s2-32c3s2-16c3-f250-f4 & 0.000 & 0.225 & 0.474 & 65.08 \\
-     16c3s2-32c3s2-32c3s2-16c3-f8      & 0.000 & 0.091 & 0.588 & 64.30 \\
-     16c3s2-32c3s2-32c3s2-16c3-f80-f8  & 0.000 & 0.149 & 0.587 & 57.09 \\ \hline
-    \end{tabular}
+     16c3-p2-32c3-p2-32c3-p2-16c3-f3     & 0.000 & 0.222 & 0.356 & 69.98 \\
+     16c3-p2-32c3-p2-32c3-p2-16c3-f100-f3 & 0.000 & 0.246 & 0.376 & 66.72 \\
+     16c3-p2-32c3-p2-32c3-p2-16c3-f250-f3 & 0.000 & 0.249 & 0.387 & 66.72 \\
+     16c3-p2-32c3-p2-32c3-p2-16c3-f250-f4 & 0.000 & 0.225 & 0.474 & 65.08 \\
+     16c3-p2-32c3-p2-32c3-p2-16c3-f8      & 0.000 & 0.091 & 0.588 & 64.30 \\
+     16c3-p2-32c3-p2-32c3-p2-16c3-f80-f8  & 0.000 & 0.149 & 0.587 & 57.09 \\ \hline
+     \end{tabular}
 \end{center}
   \caption{Validation performance of different model configurations on a large training set with multiple degrees of freedom.}
   \label{tab:large}
@@ -248,16 +260,38 @@ Data collection method quarantines, that while train and validation trajectories
 	\subfigure[Closed self-intersecting trajectory as on figure \ref{fig:model_param}(a)]{
 		\includegraphics[width=.45\textwidth]{cmp4/cnn82.png}
 	}\\
-    	\caption{Visualization of first 3 components of 8 dimensional embedding of a validation closed self-intersecting trajectories mixed CNN-FC AE.}
+    	\caption{Visualization of first 3 components of 8 dimensional embedding of a validation closed self-intersecting trajectories. Projection is learned by a mixed CNN-FC AE model with next configuration: 16c3-p2-32c3-p2-32c3-p2-16c3-f80-f8.}
     	\label{fig:model_big}
 \end{figure}
 
+In this experiment we explored several higher complexity models using different dimensionality of the embedding space: 3, 4 or 8 components. We also experimented with a mixed CNN-FC model, allowing the final layers of the projection (encoder) network to have more complex projection form. We simplicity, we provide a short description of the network architecture in the table \ref{tab:large}. We use next notation to describe network architecture of the encoder: \textit{16c3-p2-32c3-p2-32c3-p2-16c3-f100-f3}. Where first \textit{16c3} corresponds to the first network layer.  \textit{16c3} indicates that layer has 16 convolutional filters of size $3 \times 3$. It is followed by a max-pooling layer $p2$ with stride equal 2. Final layers of the encoder are two fully connected layers  \textit{f100-f3} with 100 and 3 neurons correspondingly. Convolutional layers rely on the ReLU activation function while fully connected layers use logistic sigmoid, as described in section \ref{ss:cnnaec}.
+
 Visual inspection of the embedding even without using dimensionality reduction techniques, showed that trajectory prototype maintains the characteristics actual players path. Namely it intersects itself only in a single place and the time of intersection corresponds to the time of the actual intersection of the trajectory. Yet, the path prototype appear entangled and relatively noisy comparing to previous experiments.
 
+While embedding of the validation trajectory showed continuous form and maintained key intersection, actual model scores are quite low. None of the models was able to provide any improvement in terms of the prediction of the next frame, indicating highly non-linear manifold space at current level of input video discretization.
+
+Models with higher dimensional embedding space showed better performance in terms of maintaining nearest neighbor relation in the embedding space: up to 58\% of $P_{\tau}$ score. They also allowed resulted in reconstruction of the input images. At the same time, predictive score of these models dropped.
+
+Adding another fully connected layer before the last layer of the encoder led to the marginal improvement of all metrics and, more noticeably, of the reconstruction error. Yet, we don't see adding another highly parameterized layer in such a was as a significant advantage.
 
 
+\subsection{Relevance of the depth information}
 
-\subsection{Dimensionality of the embedding space}
+In this section we compare effects of the presence or absence of the depth information in the training data. Most of the first person video data comes in form of RGB video channel, that does not contain information about the distance to the objects. In this section we try to asses, how relevant is this information to the task at hand. Results of the experiments for trivial trajectory (see \ref{fig:model_reco}(a)) and an \textit{eight} trajectory (see \ref{fig:model_param}(a)) are shown below.
 
+\begin{table}
+\begin{center}
+    \begin{tabular}{| l | l | l | l | l |}
+      \hline
+     Model configuration  &  $P_{L2}$ & $P_{\beta}$ & $P_{\tau}$ & $L_{recoRGB}$ \\ \hline
+     Trivial trajectory without depth info		& 0.135 & 0.498 & 0.676 & 63.87 \\
+     Trivial trajectory with depth info 		& 0.178 & 0.509 & 0.699 & 64.86 \\ \hline
+     "Eight" trajectory without distance information	 	& 0 & 0 & 0 & 86.60 \\
+     "Eight" trajectory with distance information		   & 0.476 & 0.778 & 0.236 & 75.49 \\ \hline
+    \end{tabular}
+\end{center}
+  \caption{Comparison of model performance on 2 distinct trajectories depending on presence or absence of the depth information. $L_{recoRGB}$ is calculated only for RGB channels for all models.}
+  \label{tab:depth}
+\end{table}
 
-\subsection{Relevance of depth information}
+Results show, that presence of the depth information in the training data is crucial for the learning the task at hand. Namely, in case of the trivial self-intersecting trajectory depth channel allowed to improve all 3 scores at hand at a low cost of reconstruction error, which is irrelevant to the task at hand. In case of a more complex trajectory model was not able to learn the concept at all without the depth information and projected all points of the trajectory into a single point on the manifold.
