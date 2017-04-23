@@ -28,7 +28,7 @@
 \ProcessOptions
 %% end class options ---------------------------------------------
 
-\LoadClass[a4paper,11pt,oneside]{book}
+\LoadClass[a4paper,12pt,twosided]{book}
 
 \RequirePackage{hgb}	% load associated style file hgb.sty
 
