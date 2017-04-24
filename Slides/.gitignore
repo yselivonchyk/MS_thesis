@@ -1,0 +1,16 @@
+*.aux
+*.bbl
+*.blg
+*.log
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.snm
+*.nav
+*~
+presentation.dvi
+presentation.ps
+presentation.pdf
