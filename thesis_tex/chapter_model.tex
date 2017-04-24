@@ -4,18 +4,18 @@
 
 In this chapter we propose a method for learning a dense manifold from image sequences.
 First we provide details about our model initialization and training procedure.
-We describe several backbone architectures that can be used a model base.
+We describe several backbone architectures that can be used as a model base.
 At last, we describe our method of robust manifold learning.
 
 
 \section{Training process}
 
-In our training we use a server with Intel Xeon CPU 2.40GHz, 64GB of RAM and a GeForce GTX TITAN X Kepler graphics card with 12GB of video memory. Server runs Debian 8.7 operation system with CUDA 8.0, CuDNN 5.1 and TensorFlow 1.0 installed.
+In our training we use a server with Intel Xeon CPU 2.40GHz, 64GB of RAM and a GeForce GTX TITAN X Kepler graphics card with 12GB of video memory. Server runs Debian 8.7 operation system with CUDA 8.0, CuDNN 5.1 and TensorFlow 1.0 software.
 
 \subsection{Tensorflow}
 
-In deep learning TensorFlow \cite{GoogleResearch2015, Abadi2016}, Torch \cite{torch}, and Caffe \cite{jia2014caffe} are among the most common choices of scientific computing framework.
-These frameworks use different underlying programming languages and show different compatibility features and qualities of managing computational resources.
+Multiple frameworks are suitable for implementation of a deep learning model. TensorFlow \cite{GoogleResearch2015, Abadi2016}, Torch \cite{torch}, and Caffe \cite{jia2014caffe} are among the most common choices of scientific computing framework.
+These tools use different underlying programming languages and show different compatibility features and qualities of managing computational resources.
 
 We use TensorFlow as our scientific computing framework of choice.
 
@@ -55,9 +55,9 @@ These techniques are described in details in chapter \ref{ch:tede}.
 We use mini-batch size of 128 as the largest one that fits into video memory.
 By grid search, we selected learning rate $n=0.0001$ for all models. This learning rate falls into the interval of recommended learning rates for Adam update rule \cite{Kingma2015}.
 
-As a termination condition of gradient descent algorithm we early stopping \ref{alg:bp}.
+As a termination condition of gradient descent algorithm we use early stopping \ref{alg:bp}.
 
-Model hyper-parameters, such as learning rate, layers sizes, regularization values and parameters of composite loss function $L=L_{reco} + \alpha L_2 + \beta L_3$ are selected using in a greedy manner.
+Model hyper-parameters, such as learning rate, layers sizes, regularization values and parameters of composite loss function $L=L_{reco} + \alpha L_2 + \beta L_3$ are optimized one at a time independently of the other parameters.
 That is, for a given set of parameters we perform grid search, adjusting a single parameter.
 After the search, the best value of the parameter is selected and updated in the parameter set.
 Grid search for the next parameter is performed independently while using updated set.
@@ -77,7 +77,7 @@ Rectifier linear units (ReLUs) can effectively die out if pre-activation value a
 
 Most commonly, \textit{Xavier initialization} is used with deep neural networks to avoid situation as described above \cite{Glorot2010}.
 Another options might include layer-wise weight initialization, pre-training of the parts of the model \cite{Simonyan2015} or applying weight regularization \cite{Good2016}.
-Yet, we would prefer the issue of weight initialization not to effect the training process.
+Yet, we would prefer the issue of weight initialization not to interfere with the training process.
 
 Xavier initializer suggest using normalized initialization, that depends on the number of input and output units of the layer \cite{Good2016}.
 Weight values are drown uniformly at random from the normal distribution $\Bbb{U}$:
@@ -93,7 +93,7 @@ where $i\in\{0, \ldots, |W_j|\}$ is a index of a weight in layer $j$ and $n_j$ i
 
 \section{Backbone architectures}
 
-In this section we provide overview of three network architectures that we consider useful for trajectory learning from visual data.
+In this section we provide an overview of three network architectures that we consider useful for trajectory learning from visual data.
 
 All architectures follow multilayer autoencoder design \cite{Hinton2006}.
 Regardless of the backbone architecture, the last layer of the encoder is a fully connected layer with small (typically smaller than 6) number of computational units.
@@ -128,16 +128,16 @@ We use logistics sigmoid as an activation function.
 In this form each fully connected layers with $n_{i-1}$ inputs and $n_i$ outputs rely on $|W_i|=n_{i-1}*n_i+n_i$ parameters.
 
 Work by Jaderberg et al. \cite{Jaderberg2015} suggests, that a fully connected neural network with a single hidden layer might be sufficient to capture spatial information about the input.
-In their work, a fully connected \textit{localization net} with a single hidden layer and small number of output units (up to 6) is used to produce transformation parameters for the image input.
+In their work, a fully connected \textit{localization net} with a single hidden layer and a small number of output units (up to 6) is used to produce transformation parameters for the image input.
 We believe that this architecture represents the most trivial design and use it as a reference backbone model.
 
 Another group of authors successfully applied fully-connected autoencoder to learn latent input representation using Generative Moment-Matching networks \cite{Li2015}.
-In their experiment, fully connected autoencoders were able to construct dense manifold of the input.
+In their experiment, fully connected autoencoders were able to construct a dense manifold of the input.
 For small datasets as MNIST and Toronto Faces Dataset \cite{tfd,lecun-mnisthandwrittendigit-2010} up to 2 hidden layers in both encoder and decoder networks were sufficient.
 
 Fully connected layers rely on huge number of parameters comparing to convolutional and deconvolutional layers.
 Number of parameters grows fast with increase in number of layers or number of output units.
-This growth of complexity in the parameter space can lead to over-fitting in form of identity learning by the network.
+This growth of complexity in the parameter space can lead to over-fitting in form of learning the identity mapping.
 
 A typical design of an autoencoder network is described by table \ref{tab:nets} and depicted on figure \ref{fig:tf_graph_1}
 % TODO: add table and figure reference
@@ -200,7 +200,7 @@ This simplification can possibly lead of lesser impact of the noisy reconstructi
 \section{Model pre-training}
 
 Xavier initialization provides good initial parameters to allow robust gradient backpropagation through a deep neural network architecture.
-This approach provides alike learning rates across layers of the network.
+This approach tries to insure alike learning speeds for all units in network starting from early iterations.
 It also decreases the chances of a neuron dying-out during initial training steps.
 We can view Xavier initialization as a method, increasing chances of effectively using full network capacity during learning.
 
@@ -221,7 +221,7 @@ We discovered that this instability can be explained by one of the next 2 factor
   While we are trying to discover spatial structure using pixel-wise means squared error (MSE), such low correlation can be detrimental to the learning process.
   The reason is, that neighboring pixels can look as different from target value as remote pixels of the image.
   Which means that a small errors in the spatial transformations of the data can result in as high error as a large spatial transformations.
-  These impedes learning process.
+  It impedes the learning process.
 \end{enumerate}
 % TODO: insert information about L2 error for neigboring pixels
 % Mathieu2015 - MSE issues
@@ -246,10 +246,10 @@ where $(x, y)$ is relative position of the effected pixel to the source of trans
 
 Our pre-training technique is therefore dependent on two parameters: blur $\sigma$ and number of pre-training steps $N$.
 We perform pre-training in scheduled way, by decreasing $\sigma$ linearly during the pre-training phase.
-This allows smooth adaptation of the model parameters to the actual training data.
+This enables smooth adaptation of the model parameters to the actual training data.
 
-We can further argue that necessity of model pre-training can be explained by the real-world limitations of existing neural models.
-Despite neural networks being universal approximator \cite{Debao1993}, some concepts might appear notoriously difficult to learn.
+We can further argue that the necessity of the pre-training can be explained by the real-world limitations of existing neural models.
+Despite neural networks being capable of to provide universal approximation \cite{Debao1993}, some concepts might appear notoriously difficult to learn.
 One recent example of such case is illustrated by learning identity mapping \cite{He2015}.
 Authors prove, that even such trivial mappings as $f(x)=x$, while having positive effect on network performance, will not be learned as an intermediate mapping of a deep network.
 We believe, that blurring the image is also one of the difficult concepts for neural networks.
@@ -277,7 +277,7 @@ While structural dependency within a single image is observed by the model at on
 With predictive objective we would like to create additional constraint on the model, that would allow learning of that temporal dependence of the data.
 
 Let's first try to describe minimum necessary number of degrees of freedom.
-Let's assume that the environment (a game map, or a building) is fixed, has no moving objects and does not change over time.
+Let's assume that the environment (a map in a game, or a building) is fixed, has no moving objects and does not change over time.
 In that case we can construct the first person view of player given next inputs:
 \begin{enumerate}
   \item $x, y, z$ - axes coordinates of the player within the environment,
@@ -298,7 +298,7 @@ Than we can state, that a local neighborhood of each point on the manifold $\hat
 Therefore, for any small neighborhood on the manifold we can approximately apply geometrical operations as in Euclidean space.
 
 To add predictive objective we shall rely on the fact, that image at time $t_i$ is statistically dependent on whole sequence of previous images ${t_0, \ldots, t_{i-1}}$.
-Given information ${t_0, \ldots, t_{i-1}}$ we can try to predict information about at time $i$.
+Given information ${t_0, \ldots, t_{i-1}}$ we can try to predict information at time stamp $i$.
 While in the space of input images this task not trivial, in the space of player parameters $p$ we can simply approximate next position $p_{t+1}$ by current movement direction.
 In other words, we can expect, that next transition of the player during small time period $\epsilon$ would be a lot like previous transition over the same period of time.
 If we express it as $p_i = p_{i-1} + \delta_{i-1}$ we can expect that $\delta_i \approx \delta_{i-1}$ for sufficiently small time step. Deriving from that, we can construct next prediction procedure:
