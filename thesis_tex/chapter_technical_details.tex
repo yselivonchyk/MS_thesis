@@ -78,7 +78,7 @@ For a 3-dimensional image $I$ of size $H \times W \times C$, where $H$,$W$,$C$ a
 \begin{equation}\label{eq:conv}
   (I \cdot K)_{x, y} = \sum_a \sum_b \sum_c K_{a,b,c} I_{x+a, y+b,c}
 \end{equation}
-where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convolution correspondingly and follow next constrains:
+where ${x, y}$ and ${a,b}$ are two-dimensional indexes of feature map and convolution correspondingly and follow next constraints:
 \begin{equation*}
   \begin{aligned}
   &1 \leq  x \leq H-h+1, \\
@@ -146,7 +146,7 @@ We use vector of partial derivatives $\nabla_\theta J(\theta)=\{ \frac{\partial 
 
 \input{auxilary/backprop}
 
-In feed-forward neural networks, due to the structural constrain, we can calculate the gradient for layer $i$ given the gradient of layer $(i+1)$ i.e. $\nabla_i J(\theta_i|\nabla_{i+1})$. The recurrent procedure of calculating the gradients from the output layer back to input layer is often called \textit{backpropagation}.
+In feed-forward neural networks, due to the structural constraint, we can calculate the gradient for layer $i$ given the gradient of layer $(i+1)$ i.e. $\nabla_i J(\theta_i|\nabla_{i+1})$. The recurrent procedure of calculating the gradients from the output layer back to input layer is often called \textit{backpropagation}.
 
 
 Gradient based methods do not guarantee to find the optimal solution.
@@ -431,13 +431,13 @@ Lets consider activations in the hidden layer $h$ for some input $x$:
   h(x) = \sigma(W_{h}x_{-1} + b_{h})
 \end{equation}
 where $W_h$ and $b_h$ are parameters of a hidden layer $h$, $x_{-1}$ is the output of the previous hidden layer and $\sigma$ is some activation function.
-Sparse autoencoders introduce an additional term $l_{sparse}$ to the loss function to add a constrain on the activations of the hidden layer $h$ \cite{Ng2011}:
+Sparse autoencoders introduce an additional term $l_{sparse}$ to the loss function to add a constraint on the activations of the hidden layer $h$ \cite{Ng2011}:
 \begin{equation}
   l_{total}(x) = l_{reconstruction}(x, g(f(x))) + \alpha*l_{sparse}(x, h(x))
 \end{equation}
 where $\alpha$ is a constant parameter.
 
-A sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the hidden layer:
+A sparsity constraint tries to achieve low average activation $\hat{\rho}$ on the hidden layer:
 
 \begin{equation}\label{eq:avgh}
   \rho = \frac{1}{N} \sum_{i=1}^N h_i(x)
@@ -446,9 +446,9 @@ A sparsity constrain tries to achieve low average activation $\hat{\rho}$ on the
 For example, let's take a look at the case for sigmoid activation function in the hidden layer.
 Sigmoid produces outputs in the interval $[0, 1]$. If we can enforce an average activation on the hidden layer $\hat{\rho} \leq 0.1$ we can rely upon the fact, that no more than $10\%$ of hidden neurons would have activation close to $1.0$.
 
-A sparse constrain allows to extract useful features even for relatively high number of hidden units. Specifically, a decoder must be able to reconstruct the original representation relying only on few high activation on the hidden layer.
+A sparse constraint allows to extract useful features even for relatively high number of hidden units. Specifically, a decoder must be able to reconstruct the original representation relying only on few high activation on the hidden layer.
 
-There are several ways to enforce a sparsity constrain.
+There are several ways to enforce a sparsity constraint.
 It is possible to perform gradient descent directly for fixed value of $\hat{\rho}$. In that case we would have to perform a second pass over the dataset to calculate the actual value of $\rho$ to be used as a target during learning with gradient descent. Instead we can simply nullify all but the $k$ highest activation during the forward pass through the network \cite{Kulkarni2015}.
 Or apply negative log-likelihood to the hidden layer of the network \cite{Zhao2015}.
 At last, to achieve true zero values on the hidden layer we can use an absolute value penalty $l_{sparse}=\sum_{i=1}^N |h_i|$ in conjunction with rectifier a linear unit activation function \cite{Glorot2011}.

@@ -98,7 +98,7 @@ In this section we provide overview of three network architectures that we consi
 All architectures follow multilayer autoencoder design \cite{Hinton2006}.
 Regardless of the backbone architecture, the last layer of the encoder is a fully connected layer with small (typically smaller than 6) number of computational units.
 We would refer to the outputs of this layer as to  \textit{input encoding} or simply \textit{encoding}.
-Additional constrains applied to the encoding are described in section \ref{ss:mf}.
+Additional constraints applied to the encoding are described in section \ref{ss:mf}.
 
 Throughout this work we stick to \textit{mirrored} designed of the encoder and decoder.
 This approach allows to balance complexity of encoder and decoder subnetworks.
@@ -274,7 +274,7 @@ Training data is represented as one or multiple sequences of images.
 Each sequence contains information about some unspecified arbitrary movement of an actor (player) through the environment (game).
 This type of data contains at least two structural dependencies: correlation of information within each single image and temporal dependencies between frames.
 While structural dependency within a single image is observed by the model at once for each input, temporal relation of the data is not taken into account.
-With predictive objective we would like to create additional constrain on the model, that would allow learning of that temporal dependence of the data.
+With predictive objective we would like to create additional constraint on the model, that would allow learning of that temporal dependence of the data.
 
 Let's first try to describe minimum necessary number of degrees of freedom.
 Let's assume that the environment (a game map, or a building) is fixed, has no moving objects and does not change over time.
@@ -367,7 +367,7 @@ Furthermore, our experiments has shown, that manifolds with large number of low 
 We, therefore propose a low-density regularization to account for regions with sharp changes.
 We suggest using an additional error term during the training phase to penalize large distances between consecutive frames, therefore dragging them closer together.
 Such regularization would compete with the reconstruction objective of the autoencoder network.
-But our main interest is interpretable feature extraction, not archiving perfect reconstruction of the images.
+But our main interest is interpretable feature extraction, not achieving perfect reconstruction of the images.
 
 Therefore, we calculate euclidean distance between pair of subsequent images:
 \begin{equation*}

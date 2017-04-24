@@ -3,4 +3,11 @@
 \chapter{Discussion}
 \label{ch:conc}
 
-In this work we proposed a deep-learning technique for mapping sequences of visual data into a manifold space while preserving key spatial relations. We analyzed the effectiveness of our approach on tasks of varying complexity. Experiments showed, that model is capable to learn effectively some trivial trajectories and reveal some structure in more complex cases. Learned solutions typically reveal local spatial relation in the data and allow to identify self-intersecting trajectories. We showed, that even while working with exclusively visual data, out approach allows to create approximate prediction of the future position and possible visual frames.    
+In this work we proposed a deep-learning technique for mapping sequences of visual data into a manifold space while preserving key spatial relations.
+We provide a pre-training technique to improve robustness of the training for high compression rates.
+The effectiveness of our approach is analyzed on tasks of varying complexity.
+Experiments showed, that the our method allows to effectively learn some trivial trajectories and recognize structure in more complex cases.
+Learned solutions reveal local spatial relation in the data and allow to identify self-intersecting trajectories.
+We showed, that, while training from exclusively visual data without any additional information, our technique extracts low-dimensional features allowing approximate prediction of future position of the subject (player).
+
+Our model in its current state appears to be highly sensitive to the complexity of the underlying concept. While using pixel-wise error as the main mean of gradient-based training, some common transformations, such as the ones resulting from changing the direction of the view, cause sharp decrease in the quality of the extracted features. In the score of the future work we propose splitting the feature space into two subspaces: one handing more precise and lower dimensional positional information and another maintaining information about changing direction of the view. Such separation of concerns would allow to achieve higher precision in positional embedding while allowing a higher dimensionality for representing direction of the view. This type of model would require some additional input apart from purely visual data, yet accessible through our current data collection method.
