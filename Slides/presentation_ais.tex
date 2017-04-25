@@ -84,7 +84,22 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 
 \section{Introduction}
 
-\subsection{Unsupervised learning}
+\subsection{Unsupervised learning in AI}
+
+\begin{frame}{Recent progress in AI}
+  Some of the recent advances in machine learning:
+  \begin{itemize}
+    \item Image classification
+    \item Machine translation
+  \end{itemize}
+  \pause
+  Important attributes of it:
+  \begin{itemize}
+    \item Low cost and high processing abilities of modern computer chips
+    \item Advances in machine learning algorithms
+    \item Access to large labeled datasets
+  \end{itemize}
+\end{frame}
 
 \begin{frame}{Importance of unsupervised learning for AI}
    \begin{figure}
@@ -93,7 +108,20 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
  \end{figure}
 \end{frame}
 
-\begin{frame}{Key components of finding a solutions}
+
+\begin{frame}{Recent advances in Unsupervised learning}
+  Some of the recent influential models:
+  \begin{itemize}
+    \item Word embedding (T. Mikolow, 2013)
+    \item Variational autoencoders (D. Kingma, 2013)
+    \item Generative Adversarial Networks (I. Goodfellow, 2014)
+  \end{itemize}
+\end{frame}
+
+
+\subsection{Localization problem}
+
+\begin{frame}{Our goal}
   \begin{itemize}
     \item Sufficient amount of training data
   \end{itemize}
@@ -103,10 +131,20 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 \end{frame}
 
 
-\subsection{Localization problem}
+
 
 \begin{frame}{Localization}
-  Localization as a task of extracting, tracking or predicting object's position in some environment from available sensory data
+  Localization as a task of extracting, tracking or predicting object's position in some environment from available sensory data.
+
+  \pause
+\vspace{1cm}
+  Types of data:
+  \begin{itemize}
+    \item Visual data: images or video sequences
+    \item Depth map
+    \item Information about position/direction of the sensors
+    \item etc.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Localization example: Tracking}
@@ -145,6 +183,18 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 \end{frame}
 
 
+\begin{frame}{Autoencoder model}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Input video information:}$
+      \vspace{0.5cm}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/sprite20.png}
+    &
+    $\text{Corresponding players path:}$
+    \vspace{0.5cm}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/tr2.png}
+    \end{tabular}
+\end{frame}
+
 \section{Approach}
 
 % \subsection{Spatial embedding model}
@@ -177,31 +227,6 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
     \end{tabular}
 \end{frame}
 
-\begin{frame}{Model pre-training. Motivation}
-  Extremely high compression rates 76200 (160*120*4) $\to$ 3..6 are notoriously difficult to learn.
-\end{frame}
-
-
-\begin{frame}{Common irregularities in the manifold space}
-  \begin{enumerate}
-  \item High density region \\
-  \item Low density regions \\
-  \item High curvature of the manifold \\
-  \end{enumerate}
-\end{frame}
-
-
-\begin{frame}[noframenumbering]{Common irregularities in the manifold space}
-  \begin{enumerate}
-  \item High density region \\
-    - Apply random noise in the encoding space to increase "save" distance between frames
-  \item Low density regions \\
-    - Add "max-distance" penalty
-  \item High curvature of the manifold \\
-    - Regularize local continuity of in the embedding space
-  \end{enumerate}
-\end{frame}
-
 
 \begin{frame}{Predictive regularization}
   Try to estimate positional encoding of the next frame using last two frames of the video.
@@ -214,20 +239,6 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 % \begin{frame}{Regularization}
 % \end{frame}
 
-\begin{frame}{Model regularization}
-  \begin{figure}
-    \includegraphics[width=0.75\textwidth,height=0.75\textheight,keepaspectratio]{images_main/prediction.png}
-    \caption{Complete model with regularization.}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}{Complete model structure}
-  \begin{figure}
-    \includegraphics[width=0.9\textwidth,height=0.9\textheight,keepaspectratio]{images/model.png}
-    \caption{Complete model with regularization.}
-  \end{figure}
-\end{frame}
 
 \subsection{Metrics}
 
