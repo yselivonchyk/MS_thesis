@@ -140,16 +140,34 @@ Number of parameters grows fast with increase in number of layers or number of o
 This growth of complexity in the parameter space can lead to over-fitting in form of learning the identity mapping.
 
 A typical design of an autoencoder network is described by table \ref{tab:nets} and depicted on figure \ref{fig:tf_graph_1}
-% TODO: add table and figure reference
+
+% 16c3s2_32c3s2_32c3s2_24c3_f2
 
 \begin{table}
 \begin{center}
-    \begin{tabular}{| p{28mm} | p{35mm} | p{35mm} | p{35mm} |}
+    \begin{tabular}{| p{25mm} | p{30mm} | p{40mm} | p{40mm} |}
       \hline
        Model & Fully-Connected AE & Convolutional AE & What-Where AE \\ \hline
-     Encoder layers		& 0.135 & 0.498 & 0.676 \\ \hline
-     Bottleneck \newline (embedding) \newline layer & 0.135 & 0.498 & 0.676 \\ \hline
-     Decoder layers		& 0.135 & 0.498 & 0.676 \\ \hline
+       \multirow{8}{*}{Encoder}		& FC: 100 units & Conv: 16 filters $3\times 3$& Conv: 16 filters $3 \times 3$ \\
+       & & max-pooling:  $2 \times 2$ & max-pooling:  $2 \times 2$  \\
+       & & Conv: 32 filters $3 \times 3$ & Conv: 32 filters $3 \times 3$ \\
+       & & max-pooling:  $2 \times 2$ & max-pooling:  $2 \times 2$  \\
+       & & Conv: 32 filters $3 \times 3$ & Conv: 32 filters $3 \times 3$ \\
+       & & max-pooling:  $2 \times 2$ & max-pooling:  $2 \times 2$  \\
+       & & Conv: 16 filters $3 \times 3$ & Conv: 16 filters $3 \times 3$ \\
+       & & max-pooling:  $2 \times 2$ & max-pooling:  $2 \times 2$  \\
+     \hline
+     Bottleneck \newline layer & FC: 2-8 units & FC: 2-8 units &FC: 2-8 units \\ \hline
+     \multirow{9}{*}{Decoder}	& FC: 100 units & FC: 4800 units & FC: 4800 units \\
+     & FC: 76800 units & upsample:  $2 \times 2$ & unpool:  $2 \times 2$ \\
+            & & DeConv: 16 filters $3 \times 3$ & DeConv: 16 filters $3 \times 3$ \\
+            & & upsample:  $2 \times 2$ & unpool:  $2 \times 2$  \\
+            & & DeConv: 32 filters $3 \times 3$ & DeConv: 32 filters $3 \times 3$ \\
+            & & upsample:  $2 \times 2$ & unpool:  $2 \times 2$  \\
+            & & DeConv: 32 filters $3 \times 3$ & DeConv: 32 filters $3 \times 3$ \\
+            & & upsample:  $2 \times 2$ & unpool:  $2 \times 2$  \\
+            & & DeConv: 16 filters $3 \times 3$ & DeConv: 16 filters $3 \times 3$ \\
+          \hline
     \end{tabular}
 \end{center}
   \caption{Configuration description of 3 main network architectures.}

@@ -1,0 +1,41 @@
+% !TEX root = ../thesis.tex
+
+\begin{algorithm}[H]
+	\KwData{X, Y  \text{ (Train set)}}
+	\KwResult{$\theta \text{ (Learned weights)}$}
+
+	$\textbf{Require: } \eta\text{: Stepsize}$
+
+	$\textbf{Require: } \beta_1, \beta_2 \in [0, 1) \text{: Exponential decay rates for the moment estimates}$
+
+	$\textbf{Require: } f(\theta) \text{: Stochastic objective function with parameters } \theta$
+
+	$\textbf{Require: } \theta_0 \text{: Initial parameter vector}$
+
+	$m_0 \gets 0 \text{ (Initialize 1st moment vector)}$
+
+	$v_0 \gets 0 \text{ (Initialize 2nd moment vector)}$
+
+	$t \gets 0 \text{ (Initialize timestep)}$
+
+	\While {$\theta_t$ not converged}{
+
+		$t \gets t + 1$
+
+		$g_t \gets \nabla_\theta f_t(\theta_{t-1}) \text{ (Get gradients w.r.t. stochastic objective at timestep t)}$
+
+		$m_t \gets \beta_1 \cdot m_{t-1} + (1-\beta_1) \cdot g_t \text{ (Update biased first moment estimate)}$
+
+		$v_t \gets \beta_2 \cdot v_{t-1} + (1-\beta_2) \cdot g_t^2 \text{ (Update biased second raw moment estimate)}$
+
+		$\hat{m}_t \gets m_t / (1-\beta_1^t) \text{ (Compute bias-corrected first moment estimate)}$
+
+		$\hat{v}_t \gets v_t/(1-\beta_2^t) \text{ (Compute bias-corrected second raw moment estimate)}$
+
+		$\theta_t \gets \theta_{t-1} - \eta \cdot \hat{m}_t / (\sqrt{\hat{v}_t}+\epsilon) \text{ (Update parameters)}$
+	}
+	$\textbf{return: } \theta_t \text{ (Resulting parameters)}$
+
+	\caption{Adam, stochastic optimization algorithm. Default settings that work good for tested problems $\eta=0.0001 \ldots 0.001$, $\beta_1=0.9$, $\beta_2=0.999$ and $\epsilon=10^{-8}$} \label{alg:adam}
+
+\end{algorithm}

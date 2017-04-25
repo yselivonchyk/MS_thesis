@@ -1,0 +1,144 @@
+% !TEX output_directory = ./build
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Autonomous Intelligent System, University of Bonn, LaTeX Beamer theme
+%
+% Copyright (C) 2010-2013 Dirk Holz, dirk.holz@ieee.org
+
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+\documentclass[pdftex]{beamer}
+\let\Tiny=\tiny
+
+% all available options --->
+% \usetheme[shadow,logoinnavbar,subsection,logoinframe,framenavbar]{AIS}
+\usetheme[shadow,logoinnavbar,subsection]{AIS}
+
+\usepackage{listings}
+
+\title[The AIS Latex Beamer Class]{Presentations with the AIS Beamer Theme}
+% \subtitle{}
+\author[D. Holz]{\highlight{Dirk Holz}\inst{1}, Some Guy\inst{2}, Another Guy\inst{2,3}}
+\institute[University of Bonn]
+{
+  \inst{1}%
+  Department of Computer Science VI\\
+  University of Bonn
+  \and
+  \inst{2}Some Institue
+  \and
+  \inst{3}Some other Institute}
+
+\date{\today}
+
+% This is only inserted into the PDF information catalog. Can be left out.
+\subject{Talks}
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection,hideothersubsection]
+  \end{frame}
+}
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+% \beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+  % \tableofcontents[pausesections]
+\end{frame}
+
+
+\section{Introduction}
+
+\subsection{The Template Class}
+
+\begin{frame}
+  empty introduction
+\end{frame}
+
+\section{Contents}
+\subsection[Typical Environments]{Typical Environments for Preseting Things}
+
+\begin{frame}{Itemize, Enumerate and Description}
+  \begin{itemize}
+  \item one item
+    \begin{itemize}
+    \item first subitem
+    \item second subitem
+    \end{itemize}
+  \item another item
+  \item yet another item
+  \end{itemize}
+  \begin{enumerate}
+  \item first item
+  \item second item
+  \item third item
+  \end{enumerate}
+  \begin{description}
+  \item[ABCD] Characters
+  \item[123432] Numbers
+  \item[nothing] ``nothing'' in here
+  \end{description}
+\end{frame}
+
+
+\begin{frame}{Blocks}
+  \begin{block}{block with title}
+    Content: Summarized information in block.
+  \end{block}
+  \begin{exampleblock}{An example}
+    Some example in here!
+  \end{exampleblock}
+  \begin{alertblock}{An alert block}
+    For something that's really important and/or a serious drawback of something.
+  \end{alertblock}
+  \begin{block}{}
+    Content of a block without title
+  \end{block}
+\end{frame}
+
+
+\section*{Summary}
+
+\begin{frame}
+  \frametitle<presentation>{Summary}
+
+  \begin{itemize}
+  \item The \alert{first main message} of your talk in one or two lines.
+  \end{itemize}
+
+  % The following outlook is optional.
+  \vskip0pt plus.5fill
+  \begin{itemize}
+  \item Outlook
+    \begin{itemize}
+    \item Something you haven't solved.
+    \item Something else you haven't solved.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\end{document}

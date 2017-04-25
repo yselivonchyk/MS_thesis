@@ -1,0 +1,38 @@
+% !TEX root = ../thesis.tex
+
+% \begin{figure}[h!]
+%   % \centering
+%     \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{ae.png}
+%   \caption{Autoencoder.}
+%   \label{fig:ae}
+% \end{figure}
+
+
+\begin{figure}
+
+\centering
+\begin{tikzpicture}
+  [
+    state/.style={draw, rectangle, minimum width=6mm, minimum height=6mm, inner sep=2pt},
+    func/.style={draw, circle, minimum width=1cm, minimum height=1cm, inner sep=2pt},
+    loss/.style={draw, diamond, minimum width=1cm, minimum height=1cm, inner sep=2pt},
+    node distance=20mm,
+    classical/.style={dashed,->,shorten >=4pt,shorten <=4pt,>=stealth}
+  ]
+  \node (x) [state, label=left:Input] {$x$};
+  \node (f) [func, below of=x,label=left:Encoder] {$f(x)$};
+  \node(h)[state, below of=f, right of=f,label=below:Features]{$h$};
+  \node(g)[func, above of=h, right of=h,label=right:Decoder]{$g(h)$};
+  \node(y)[state, above of=g, label=right:Reconstruction]{$y$};
+  \node(l)[loss, right of=x, label=below:Loss]{$L2$};
+
+  \draw [->] (x) -- (f);
+  \draw [->] (f) -- (h);
+  \draw [->] (h) -- (g);
+  \draw [->] (g) -- (y);
+  \draw [classical] (l) -- (x);
+  \draw [classical] (l) -- (y);
+\end{tikzpicture}
+\caption{An autoencoder with euclidian reconstruction loss.}
+\label{fig:ae}
+\end{figure}
