@@ -18,7 +18,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-\documentclass[pdftex, handout]{beamer}
+\documentclass[pdftex]{beamer}
 \let\Tiny=\tiny
 
 % all available options --->
@@ -121,17 +121,6 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 
 \subsection{Localization problem}
 
-\begin{frame}{Our goal}
-  \begin{itemize}
-    \item Sufficient amount of training data
-  \end{itemize}
-  \begin{itemize}
-    \item Computational feasibility of the problem
-  \end{itemize}
-\end{frame}
-
-
-
 
 \begin{frame}{Localization}
   Localization as a task of extracting, tracking or predicting object's position in some environment from available sensory data.
@@ -172,7 +161,7 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 \end{frame}
 
 \begin{frame}{Motivation. Continuied}
-  Goal of this work: reconstruction of the actors trajectory in some low-dimensional manifold space in first-person shooter (games) from visual data.
+  Goal of this work: extracting interpretable low-dimensional representation of players movements in first-person shooter (games) from visual (video) data.
 
   \pause
 
@@ -189,25 +178,26 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
       \vspace{0.5cm}
     \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/sprite20.png}
     &
-    $\text{Corresponding players path:}$
+    $\text{Corresponding player's path:}$
     \vspace{0.5cm}
     \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/tr2.png}
     \end{tabular}
 \end{frame}
 
-\begin{frame}{Manifold learning}
-
-\end{frame}
+% \begin{frame}{Manifold learning}
+%
+% \end{frame}
 
 \begin{frame}{Example reconstructions}
     \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
-      $\text{Input video information:}$
+      $\text{Original trajectory on the video:}$
       \vspace{0.5cm}
-    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp2/ww_3.png}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp2/tr1.png}
     &
-    $\text{Corresponding players path:}$
+    $\text{Our embedding in a 3D space:}$
     \vspace{0.5cm}
-    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp2/tr1.png}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp2/ww_3.png}
+
     \end{tabular}
 \end{frame}
 
@@ -244,7 +234,84 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
 \end{frame}
 
 
-\begin{frame}{Predictive regularization}
+\begin{frame}{Autoencoder. Primary goal}
+  While good quality reconstruction is desirable, we will focus on producing high quality representation in the embedding space $H$.
+\vspace{1cm}
+
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images/ae2.png}
+    &
+    Original images and their reconstruction
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images/reco.png}
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[noframenumbering]{Autoencoder. Primary goal}
+  While good quality reconstruction is desirable, we will focus on producing high quality representation in the embedding space $H$.
+\vspace{1cm}
+
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images/ae2.png}
+    &
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images/reco3.png}
+    \end{tabular}
+\end{frame}
+
+
+\begin{frame}{Our contributions. Training process}
+  \begin{itemize}
+    \item We propose a robust training technique that allows unsupervised visual data embedding into extremely low dimensional space.
+
+    Our model requires compression ratio of 10000:1, but allows information loss.
+    \item We describe regularization techniques that allow to preserve spatial relations in the embedding space
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Data collection}
+  We use \texttt{VizDoom} scientific research platform, which is based on a 3D engine of FPS game \texttt{DoomII}.
+
+  \begin{figure}
+    \includegraphics[width=0.62\textwidth,height=0.62\textheight,keepaspectratio]{images_main/doom.png}
+    \caption{Visual data in \texttt{DoomII} computer game.}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}{Data collection. Continued}
+  We collect several trajectories for our evaluation:
+  \begin{itemize}
+    \item Trivial trajectories: showing simple transitions as walking along the axis with limited degress of freedom.
+    \item Trajectories of natural, yet, predictable movement. As running in an \textit{eight}.
+    \item Random movement on the map.
+  \end{itemize}
+\end{frame}
+
+% \begin{frame}{Regularization}
+% \end{frame}
+
+
+
+
+
+\section{Evaluation}
+
+\subsection{Metrics}
+
+\begin{frame}{Our goals}
+  Qualities of a good spatial embedding:
+  \begin{itemize}
+    \item It is visually interpretable;
+    \item It preserves spatial structure of the trajectories in Euclidean space:
+      \begin{itemize}
+        \item Key trajectory elements: turns, intersections
+        \item Point-to-point relations
+      \end{itemize}
+    \item It allows prediction of the future frames.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Prediction in the embedding space}
   Try to estimate positional encoding of the next frame using last two frames of the video.
   \begin{figure}
     \includegraphics[width=0.75\textwidth,height=0.75\textheight,keepaspectratio]{images_main/prediction.png}
@@ -252,36 +319,118 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
   \end{figure}
 \end{frame}
 
-% \begin{frame}{Regularization}
+\subsection{Results}
+
+\begin{frame}{Trivial trajectory}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Original trajectory on the video:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp2/tr1.png}
+    &
+    $\text{Our embedding in a 3D space:}$
+    \vspace{0.5cm}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/fc20.png}
+
+    \end{tabular}
+\end{frame}
+
+\begin{frame}{Trivial trajectory. Continued}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Trajectory:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/fc20.png}
+    &
+    Key characteristics
+    \begin{itemize}
+      \item Trajectory is visually recognizable
+      \item Subsequent frames remain nearest neighbors 78\% of the time
+      \item Predicted frames are on average 37\% closer to actual embedding comparing to current frame
+    \end{itemize}
+    \end{tabular}
+\end{frame}
+
+
+\begin{frame}{Natural trajectory}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Original trajectory on the video:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/tr2.png}
+    &
+    $\text{Our embedding in a 3D space:}$
+    \vspace{0.5cm}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/cnn4_2.png}
+
+    \end{tabular}
+\end{frame}
+
+\begin{frame}{Natural trajectory. Continued}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Trajectory embedding:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/cnn4_2.png}
+    &
+    Key characteristics
+    \begin{itemize}
+      \item Trajectory is hard to recognize
+      \item Subsequent frames remain nearest neighbors 91\% of the time
+      \item Predicted frames are on average 58\% closer to actual embedding comparing to the current frame
+    \end{itemize}
+    \end{tabular}
+\end{frame}
+
+% \begin{frame}{General trajectory}
+%     \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+%       $\text{Original trajectory on the video:}$
+%       \vspace{0.5cm}
+%       \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/tr2.png}
+%     &
+%     $\text{Our embedding in a 3D space:}$
+%     \vspace{0.5cm}
+%     \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp4/cnn8_3.png}
+%
+%     \end{tabular}
 % \end{frame}
 
 
-\subsection{Metrics}
+\begin{frame}[noframenumbering]{General trajectory}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Original trajectory on the video:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp3/tr2.png}
+    &
+    $\text{Our embedding in a 3D space:}$
+    \vspace{0.5cm}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp4/cnn8_3.png}
 
-\begin{frame}
+    \end{tabular}
 \end{frame}
 
+\begin{frame}[noframenumbering]{General trajectory}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Original trajectory on the video:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp2/tr1.png}
+    &
+    $\text{Our embedding in a 3D space:}$
+    \vspace{0.5cm}
+    \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp4/cnn8.png}
 
-\section{Evaluation}
-
-\subsection{Data collection}
-
-\begin{frame}
+    \end{tabular}
 \end{frame}
 
-\begin{frame}
-\end{frame}
-
-
-\subsection{Results}
-
-\begin{frame}
-\end{frame}
-
-\begin{frame}
-\end{frame}
-
-\begin{frame}{Definition}
+\begin{frame}{General trajectory. Continued}
+    \begin{tabular}{p{.5\textwidth} p{.5\textwidth}}
+      $\text{Trajectory embedding:}$
+      \vspace{0.5cm}
+      \adjincludegraphics[width=.9\linewidth,valign=t]{images_main/cmp4/cnn8_3.png}
+    &
+    Key characteristics
+    \begin{itemize}
+      \item Trajectory is not recognizable
+      \item Subsequent frames remain nearest neighbors 58\% of the time
+      \item Only 19\% of predicted frames were at least somewhat closer to the actual embedding than current frame
+    \end{itemize}
+    \end{tabular}
 \end{frame}
 
 
@@ -291,7 +440,26 @@ Prof. Dr. Stefan Wrobel\inst{2}, \\
   \frametitle<presentation>{Summary}
 
   \begin{itemize}
-  \item The \alert{first main message} of your talk in one or two lines.
+  \item We proposed a model for unsupervised learning of topological trajectory from first-person video
+  \item We successfully trained the model on trajectories of various complexities
+  \item We identified the limits of our model depending on the complexity of training concepts
+  \end{itemize}
+
+%   % The following outlook is optional.
+  \vskip0pt plus.5fill
+  \begin{itemize}
+  \item Shortcomings:
+    \begin{itemize}
+    \item The embedding is not robust against some common transformations.
+    \item Current concept do not allow to separate positional information of the player from direction of players view.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future work}
+
+  \begin{itemize}
+  \item Manifold
   \end{itemize}
 
   % The following outlook is optional.

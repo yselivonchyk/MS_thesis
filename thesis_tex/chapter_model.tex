@@ -2,7 +2,7 @@
 
 \chapter{Model}\label{ch:mode}
 
-In this chapter we propose a method for learning a dense manifold from image sequences.
+In this chapter we propose a learning method for embedding visual data while preserving spatial relations.
 First we provide details about our model initialization and training procedure.
 We describe several backbone architectures that can be used as a model base.
 At last, we describe our method of robust manifold learning.
@@ -14,7 +14,7 @@ In our training we use a server with Intel Xeon CPU 2.40GHz, 64GB of RAM and a G
 
 \subsection{Tensorflow}
 
-Multiple frameworks are suitable for implementation of a deep learning model. TensorFlow \cite{GoogleResearch2015, Abadi2016}, Torch \cite{torch}, and Caffe \cite{jia2014caffe} are among the most common choices of scientific computing framework.
+Multiple frameworks are suitable for implementation of a deep learning model. TensorFlow \cite{GoogleResearch2015, Abadi2016}, Torch \cite{torch}, and Caffe \cite{jia2014caffe} are among common choices of scientific computing frameworks.
 These tools use different underlying programming languages and show different compatibility features and qualities of managing computational resources.
 
 We use TensorFlow as our scientific computing framework of choice.
@@ -35,7 +35,7 @@ An example of a computational graph of the single-layer perceptron is shown on f
 TensorFlow provides cross platform compatibility, which allows to run code on different types of devices and operation systems.
 Abstraction over underlying system allows to run models, build with TensorFlow, both on GPUs and CPU without code changes.
 Integration with hight performance computing libraries as CUDA \cite{Nickolls2008} and native support of distributed computing makes it a good candidate for computer vision tasks.
-An competition winning family of convolutional neural networks Inception is solely developed and maintained on that platform \cite{Szegedy2016}.
+An competition winning family of convolutional neural networks Inception is developed and maintained on that platform \cite{Szegedy2016}.
 
 We use TensorFlow as our framework of choice for several reasons.
 First of all, being a cross-platform frameworks it enables larger audience to reuse results of our research.
@@ -55,7 +55,15 @@ These techniques are described in details in chapter \ref{ch:tede}.
 We use mini-batch size of 128 as the largest one that fits into video memory.
 By grid search, we selected learning rate $n=0.0001$ for all models. This learning rate falls into the interval of recommended learning rates for Adam update rule \cite{Kingma2015}.
 
-As a termination condition of gradient descent algorithm we use early stopping \ref{alg:bp}.
+As a termination condition of gradient descent algorithm we use early stopping \ref{alg:bp}. Typically, training requires 300 to 10000 complete passes through the data, depending on the size of the dataset. Training time might vary from 2 hours for the smallest dataset of 5000 images to 500 hours for the largest dataset of 300000 images.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.4\textwidth,height=0.4\textheight,keepaspectratio]{training_loss.png}
+  \caption{Visualization of the reconstruction loss over the iterations. Vertical bar indicates end of the pre-training process.}
+  \label{fig:tf_graph}
+\end{figure}
+
 
 Model hyper-parameters, such as learning rate, layers sizes, regularization values and parameters of composite loss function $L=L_{reco} + \alpha L_2 + \beta L_3$ are optimized one at a time independently of the other parameters.
 That is, for a given set of parameters we perform grid search, adjusting a single parameter.
@@ -239,6 +247,7 @@ We discovered that this instability can be explained by one of the next 2 factor
   While we are trying to discover spatial structure using pixel-wise means squared error (MSE), such low correlation can be detrimental to the learning process.
   The reason is, that neighboring pixels can look as different from target value as remote pixels of the image.
   Which means that a small errors in the spatial transformations of the data can result in as high error as a large spatial transformations.
+  In particular, on our dataset we found, that for on average in 5\% of the cases for pair of frames $n_i, n_{i+1}$ there exits a frame $n_j$ such that $L(n_i, n_{i+1}) > L(n_i, n_j)$.
   It impedes the learning process.
 \end{enumerate}
 % TODO: insert information about L2 error for neigboring pixels
@@ -356,11 +365,10 @@ From observation, images in the same lump tend to show high similarity between e
 This behavior can be explained by largely uneven similarity between images across the training set.
 For instance, let's says a single step along some trajectory is represented by $N$ discrete time-steps and, therefore, $N$ distinct sequential image inputs.
 We can argue, that 2 distinct $N$-sequences from different parts of the trajectory might have highly different variation within the sequence.
-As, for example, a single step towards the wall would cause either significant or almost unnoticeable change of the view depending on the distance from the wall.
+As, for example, a single step towards the wall would cause either significant or almost unnoticeable change of the view depending on the distance from the wall. Specifically, for our dataset $max(L_2(x_i, x_{i+1})) > 9 * min(L_2(x_j, x_{j+1})) | i,j \in [0, N]$ - maximum subsequent frame error differs at least 9 times.
 
 High contrast of the degree of pair-wise image similarity across the dataset means, that alike errors in determining current position $p_i$ would cause highly uneven reconstruction error $L_{reco}$ depending on position $p_i$.
 This, in turn, would lead to smaller gradient values during the learning process.
-In the extreme case, gradients produced within regions of high similarity can be comparable or smaller than the noise of gradients of less similar regions.
 
 To resolve this issue we propose using noise injection in the manifold space.
 We suggest, that noisy embeddings would allow to enforce a minimum distance between input prototypes in the embedding space.
